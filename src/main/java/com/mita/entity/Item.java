@@ -1,5 +1,6 @@
 package com.mita.entity;
 
+import com.mita.dto.ItemDto;
 import jakarta.persistence.*;
 
 @Entity
@@ -26,7 +27,7 @@ public class Item {
 
     public Item() {}
 
-    public Item(Category category, String title, Double rating, String additionalInfo) {
+    public Item(String title, Double rating, String additionalInfo, Category category) {
         this.category = category;
         this.title = title;
         this.rating = rating;
@@ -72,4 +73,14 @@ public class Item {
     public void setAdditionalInfo(String additionalInfo) {
         this.additionalInfo = additionalInfo;
     }
+
+    public ItemDto toDto() {
+        return new ItemDto(id,
+                title,
+                rating,
+                additionalInfo
+        );
+    }
+
+
 }

@@ -1,5 +1,6 @@
 package com.mita.entity;
 
+import com.mita.dto.CategoryDto;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -30,4 +31,9 @@ public class Category {
     public Category(Long id) {
         this.id = id;
     }
+
+    public CategoryDto toDto() {
+        return new CategoryDto(id);
+    }
+
 }
