@@ -11,9 +11,6 @@ public class Item {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "category_id", nullable = false)
-    private Long categoryId;
-
     @Column(name = "title", nullable = false)
     private String title;
 
@@ -23,11 +20,14 @@ public class Item {
     @Column(name = "additional_info", nullable = false)
     private String additionalInfo;
 
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 
     public Item() {}
 
-    public Item(Long categoryId, String title, Double rating, String additionalInfo) {
-        this.categoryId = categoryId;
+    public Item(Category category, String title, Double rating, String additionalInfo) {
+        this.category = category;
         this.title = title;
         this.rating = rating;
         this.additionalInfo = additionalInfo;
@@ -41,12 +41,12 @@ public class Item {
         return id;
     }
 
-    public Long getCategoryId() {
-        return categoryId;
+    public Category getCategory() {
+        return category;
     }
 
-    public void setCategoryId(Long categoryId) {
-        this.categoryId = categoryId;
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
     public String getTitle() {
