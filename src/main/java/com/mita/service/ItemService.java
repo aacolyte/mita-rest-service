@@ -1,9 +1,12 @@
 package com.mita.service;
 
 
+import com.mita.dto.CategoryDto;
 import com.mita.dto.ItemContainerDto;
 import com.mita.dto.ItemDto;
+import com.mita.entity.Category;
 import com.mita.entity.Item;
+import com.mita.repository.CategoryRepository;
 import com.mita.repository.ItemRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +19,13 @@ import java.util.stream.Collectors;
 @Transactional
 public class ItemService {
 
+    private final CategoryRepository categoryRepository;
     private ItemRepository itemRepository;
 
     @Autowired
-    public ItemService(ItemRepository itemRepository) {
+    public ItemService(ItemRepository itemRepository, CategoryRepository categoryRepository) {
         this.itemRepository = itemRepository;
+        this.categoryRepository = categoryRepository;
     }
 
 
@@ -37,6 +42,13 @@ public class ItemService {
                 .orElseThrow(()-> new IllegalArgumentException("Item with id: "+ id +" not found"));
     }
 
+    public ItemDto createItem(ItemDto itemDto) {
+        Category category = categoryRepository.findById(itemDto.getCategoryId()).orElseThrow(
+                ()-> new IllegalArgumentException("Category with id: "+ itemDto.getCategoryId() +" not found")
+        );
+        Item item = itemDto.toEntity(category);
+        return itemRepository.save(item).toDto();
+    }
 
 
 

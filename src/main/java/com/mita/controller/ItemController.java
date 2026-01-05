@@ -4,10 +4,7 @@ import com.mita.dto.ItemContainerDto;
 import com.mita.dto.ItemDto;
 import com.mita.service.ItemService;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/api")
@@ -29,6 +26,12 @@ public class ItemController {
     @GetMapping("/items/{id}")
     public ItemDto getItemById(@PathVariable Long id){
         return itemService.getItemById(id);
+    }
+
+    @ResponseBody
+    @PostMapping("/items")
+    public ItemDto createItem(@RequestBody ItemDto itemDto) {
+        return itemService.createItem(itemDto);
     }
 
 

@@ -9,13 +9,13 @@ public class Item {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column
     private Long id;
 
-    @Column(name = "title", nullable = false)
+    @Column(nullable = false)
     private String title;
 
-    @Column(name = "rating", nullable = false)
+    @Column(nullable = false)
     private Double rating;
 
     @Column(name = "additional_info", nullable = false)
@@ -78,7 +78,8 @@ public class Item {
         return new ItemDto(id,
                 title,
                 rating,
-                additionalInfo
+                additionalInfo,
+                category.getId()
         );
     }
 

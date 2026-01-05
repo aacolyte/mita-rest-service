@@ -12,8 +12,11 @@ public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column
     private Long id;
+
+    @Column
+    private String name;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     private List<Item> items = new ArrayList<>();
@@ -26,14 +29,25 @@ public class Category {
         this.id = id;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public Category(){}
 
-    public Category(Long id) {
+    public Category(Long id, String name) {
         this.id = id;
+        this.name = name;
     }
 
+
     public CategoryDto toDto() {
-        return new CategoryDto(id);
+        return new CategoryDto(id,name);
     }
+
 
 }

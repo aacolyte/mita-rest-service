@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,6 +32,14 @@ public class CategoryService {
         return categoryRepository.findById(id)
                 .map(Category::toDto)
                 .orElseThrow(()-> new IllegalArgumentException("Category with id: "+ id +" not found"));
+    }
+
+    public CategoryDto createCategory(CategoryDto categoryDto) {
+        Category category = new Category(
+                categoryDto.getId(),
+                categoryDto.getName()
+        );
+        return categoryRepository.save(category).toDto();
     }
 
 }
