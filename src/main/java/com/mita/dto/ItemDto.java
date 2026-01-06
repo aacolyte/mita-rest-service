@@ -38,12 +38,6 @@ public class ItemDto {
         return categoryId;
     }
 
-    public Item toEntity(Category category) {
-        return new Item(
-                this.getTitle(),
-                this.getRating(),
-                this.getAdditionalInfo(),
-                category
-        );
+
     }
 }

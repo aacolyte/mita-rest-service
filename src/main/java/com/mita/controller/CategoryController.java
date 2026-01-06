@@ -4,6 +4,7 @@ package com.mita.controller;
 import com.mita.dto.CategoryContainerDto;
 
 import com.mita.dto.CategoryDto;
+import com.mita.dto.request.CategoryCreateRequest;
 import com.mita.dto.request.CategoryUpdateRequest;
 import com.mita.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,13 +38,21 @@ public class CategoryController {
 
     @ResponseBody
     @PostMapping
-    public CategoryDto createCategory(@RequestBody CategoryDto categoryDto) {
-        return categoryService.createCategory(categoryDto);
+    public CategoryDto createCategory(@RequestBody CategoryCreateRequest request) {
+        return categoryService.createCategory(request);
     }
     @ResponseBody
     @PutMapping("/{id}")
     public CategoryDto updateCategory(@PathVariable Long id, @RequestBody CategoryUpdateRequest request) {
         return categoryService.updateCategory(id, request);
     }
+
+    @ResponseBody
+    @DeleteMapping("/{id}")
+    public void deleteCategory(@PathVariable Long id) {
+        categoryService.deleteCategory(id);
+    }
+
+
 
 }

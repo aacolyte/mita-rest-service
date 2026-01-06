@@ -2,6 +2,7 @@ package com.mita.controller;
 
 import com.mita.dto.ItemContainerDto;
 import com.mita.dto.ItemDto;
+import com.mita.dto.request.ItemCreateRequest;
 import com.mita.dto.request.ItemUpdateRequest;
 import com.mita.service.ItemService;
 import org.springframework.stereotype.Controller;
@@ -24,21 +25,27 @@ public class ItemController {
     }
 
     @ResponseBody
-    @GetMapping
+    @GetMapping("/{id}")
     public ItemDto getItemById(@PathVariable Long id){
         return itemService.getItemById(id);
     }
 
     @ResponseBody
     @PostMapping
-    public ItemDto createItem(@RequestBody ItemDto itemDto) {
-        return itemService.createItem(itemDto);
+    public ItemDto createItem(@RequestBody ItemCreateRequest request) {
+        return itemService.createItem(request);
     }
 
     @ResponseBody
-    @PutMapping("")
+    @PutMapping("/{id}")
     public ItemDto updateItem(@PathVariable Long id, @RequestBody ItemUpdateRequest request) {
         return itemService.updateItem(id,request);
+    }
+
+    @ResponseBody
+    @DeleteMapping("/{id}")
+    public void deleteItem(@PathVariable Long id) {
+        itemService.deleteItem(id);
     }
 
 

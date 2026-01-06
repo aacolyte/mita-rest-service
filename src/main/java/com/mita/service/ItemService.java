@@ -1,9 +1,9 @@
 package com.mita.service;
 
 
-import com.mita.dto.CategoryDto;
 import com.mita.dto.ItemContainerDto;
 import com.mita.dto.ItemDto;
+import com.mita.dto.request.ItemCreateRequest;
 import com.mita.dto.request.ItemUpdateRequest;
 import com.mita.entity.Category;
 import com.mita.entity.Item;
@@ -43,11 +43,11 @@ public class ItemService {
                 .orElseThrow(()-> new IllegalArgumentException("Item with id: "+ id +" not found"));
     }
 
-    public ItemDto createItem(ItemDto itemDto) {
-        Category category = categoryRepository.findById(itemDto.getCategoryId()).orElseThrow(
-                ()-> new IllegalArgumentException("Category with id: "+ itemDto.getCategoryId() +" not found")
+    public ItemDto createItem(ItemCreateRequest request) {
+        Category category = categoryRepository.findById(request.getCategoryId()).orElseThrow(
+                ()-> new IllegalArgumentException("Category with id: "+ request.getCategoryId() +" not found")
         );
-        Item item = itemDto.toEntity(category);
+        Item item = request.toEntity(category);
         return itemRepository.save(item).toDto();
     }
 
@@ -57,5 +57,8 @@ public class ItemService {
         return item.toDto();
     }
 
+    public void deleteItem(Long id) {
+        itemRepository.deleteById(id);
+    }
 
 }
