@@ -4,6 +4,7 @@ package com.mita.controller;
 import com.mita.dto.CategoryContainerDto;
 
 import com.mita.dto.CategoryDto;
+import com.mita.dto.request.CategoryUpdateRequest;
 import com.mita.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
-@RequestMapping("/api")
+@RequestMapping("/api/categories")
 public class CategoryController {
 
     private CategoryService categoryService;
@@ -23,21 +24,26 @@ public class CategoryController {
     }
 
     @ResponseBody
-    @GetMapping("/categories")
+    @GetMapping
     public CategoryContainerDto getCategoryList() {
         return categoryService.getAllCategories();
     }
 
     @ResponseBody
-    @GetMapping("/categories/{id}")
+    @GetMapping("/{id}")
     public CategoryDto getCategoryById(@PathVariable Long id) {
         return categoryService.getCategoryById(id);
     }
 
     @ResponseBody
-    @PostMapping("/categories")
+    @PostMapping
     public CategoryDto createCategory(@RequestBody CategoryDto categoryDto) {
         return categoryService.createCategory(categoryDto);
+    }
+    @ResponseBody
+    @PutMapping("/{id}")
+    public CategoryDto updateCategory(@PathVariable Long id, @RequestBody CategoryUpdateRequest request) {
+        return categoryService.updateCategory(id, request);
     }
 
 }

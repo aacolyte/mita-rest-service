@@ -2,6 +2,7 @@ package com.mita.service;
 
 import com.mita.dto.CategoryContainerDto;
 import com.mita.dto.CategoryDto;
+import com.mita.dto.request.CategoryUpdateRequest;
 import com.mita.entity.Category;
 import com.mita.repository.CategoryRepository;
 import jakarta.transaction.Transactional;
@@ -40,6 +41,14 @@ public class CategoryService {
                 categoryDto.getName()
         );
         return categoryRepository.save(category).toDto();
+    }
+
+    public CategoryDto updateCategory(Long id, CategoryUpdateRequest request) {
+        Category category = categoryRepository.findById(id).orElseThrow(
+                ()-> new IllegalArgumentException("Category with id: "+ id +" not found"));
+        request.applyTo(category);
+        return category.toDto();
+
     }
 
 }
