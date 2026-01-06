@@ -1,8 +1,6 @@
 package com.mita.dto;
 
 
-import com.mita.entity.Category;
-import com.mita.entity.Item;
 
 public class ItemDto {
     private final Long id;
@@ -38,6 +36,5 @@ public class ItemDto {
         return categoryId;
     }
 
-
-    }
 }
+
