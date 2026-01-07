@@ -49,7 +49,7 @@ public class CategoryService {
 
     }
 
-    public void deleteCategory(Long id) {
+    public void deleteCategoryById(Long id) {
         categoryRepository.deleteById(id);
     }
 

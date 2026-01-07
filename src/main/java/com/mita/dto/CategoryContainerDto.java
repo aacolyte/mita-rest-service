@@ -11,7 +11,7 @@ public class CategoryContainerDto {
         this.categoryList = categoryList;
     }
 
-    public List<CategoryDto> getCategoryList() {
+    public List<CategoryDto> getAllCategories() {
         return categoryList;
     }
 }
