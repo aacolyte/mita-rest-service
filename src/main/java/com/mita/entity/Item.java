@@ -12,7 +12,7 @@ public class Item {
     @Column
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String title;
 
     @Column(nullable = false)

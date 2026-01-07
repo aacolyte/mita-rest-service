@@ -1,9 +1,16 @@
 package com.mita.dto.request;
 
 import com.mita.entity.Item;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
 
 public class ItemUpdateRequest {
     private final String title;
+
+    @NotNull
+    @DecimalMin(value = "0.0", inclusive = true)
+    @DecimalMax(value = "10.0", inclusive = true)
     private final Double rating;
     private final String additionalInfo;
 

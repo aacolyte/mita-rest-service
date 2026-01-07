@@ -50,6 +50,10 @@ public class CategoryService {
     }
 
     public void deleteCategoryById(Long id) {
+        if (!categoryRepository.existsById(id)) {
+            throw new IllegalArgumentException("Category with id: " + id + " not found");
+        }
+
         categoryRepository.deleteById(id);
     }
 

@@ -58,6 +58,10 @@ public class ItemService {
     }
 
     public void deleteItem(Long id) {
+        if (!itemRepository.existsById(id)) {
+            throw new IllegalArgumentException("Item with id: " + id + " not found");
+        }
+
         itemRepository.deleteById(id);
     }
 

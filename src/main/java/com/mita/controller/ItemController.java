@@ -5,6 +5,7 @@ import com.mita.dto.ItemDto;
 import com.mita.dto.request.ItemCreateRequest;
 import com.mita.dto.request.ItemUpdateRequest;
 import com.mita.service.ItemService;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,13 +33,13 @@ public class ItemController {
 
     @ResponseBody
     @PostMapping
-    public ItemDto createItem(@RequestBody ItemCreateRequest request) {
+    public ItemDto createItem(@Valid @RequestBody ItemCreateRequest request) {
         return itemService.createItem(request);
     }
 
     @ResponseBody
     @PutMapping("/{id}")
-    public ItemDto updateItem(@PathVariable Long id, @RequestBody ItemUpdateRequest request) {
+    public ItemDto updateItem(@Valid @PathVariable Long id, @RequestBody ItemUpdateRequest request) {
         return itemService.updateItem(id,request);
     }
 
