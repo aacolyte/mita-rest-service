@@ -12,7 +12,7 @@ public class ItemContainerDto {
         this.itemList = itemList;
     }
 
-    public List<ItemDto> getItemList() {
+    public List<ItemDto> getAllItems() {
         return itemList;
     }
 }

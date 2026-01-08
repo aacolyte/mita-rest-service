@@ -36,7 +36,6 @@ public class CategoryServiceTest {
 
     @BeforeEach
     public void setUp() {
-        request = new CategoryCreateRequest("Anime");
         savedCategory = new Category();
         savedCategory.setId(1L);
         savedCategory.setName("Anime");
@@ -44,6 +43,8 @@ public class CategoryServiceTest {
 
     @Test
     void shouldCreateCategory() {
+        request = new CategoryCreateRequest("Anime");
+
         when(categoryRepository.save(any(Category.class)))
                 .thenReturn(savedCategory);
 
@@ -104,6 +105,7 @@ public class CategoryServiceTest {
 
     @Test
     void shouldDeleteCategory_whenCategoryExists() {
+        when(categoryRepository.existsById(1L)).thenReturn(true);
         categoryService.deleteCategoryById(1L);
         verify(categoryRepository, times(1)).deleteById(1L);
     }

@@ -57,7 +57,7 @@ public class ItemService {
         return item.toDto();
     }
 
-    public void deleteItem(Long id) {
+    public void deleteItemById(Long id) {
         if (!itemRepository.existsById(id)) {
             throw new IllegalArgumentException("Item with id: " + id + " not found");
         }

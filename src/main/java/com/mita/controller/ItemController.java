@@ -45,8 +45,8 @@ public class ItemController {
 
     @ResponseBody
     @DeleteMapping("/{id}")
-    public void deleteItem(@PathVariable Long id) {
-        itemService.deleteItem(id);
+    public void deleteItemById(@PathVariable Long id) {
+        itemService.deleteItemById(id);
     }
 
 
