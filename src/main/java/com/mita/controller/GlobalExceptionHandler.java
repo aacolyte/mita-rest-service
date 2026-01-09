@@ -12,12 +12,15 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+
+    // Catching exceptions from services
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleIllegalArgument(IllegalArgumentException ex){
         return Map.of("error", ex.getMessage());
     }
 
+    // Catching database constraint violations
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleDuplicate(DataIntegrityViolationException ex) {
@@ -32,6 +35,7 @@ public class GlobalExceptionHandler {
         return Map.of("error", message);
     }
 
+    // JSON is malformed, type mismatch
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleJsonParseError(HttpMessageNotReadableException ex) {

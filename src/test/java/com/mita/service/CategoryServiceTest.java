@@ -15,10 +15,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -67,6 +67,18 @@ public class CategoryServiceTest {
         assertEquals("Anime",result.getName());
         verify(categoryRepository,times(1)).findById(1L);
     }
+
+    @Test
+    void shouldThrowException_WhenCategoryDoesNotExist() {
+        when(categoryRepository.findById(99L)).thenReturn(Optional.empty());
+
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> categoryService.getCategoryById(99L)
+        );
+        assertEquals("Category with id: "+99+ " not found", ex.getMessage());
+    }
+
 
     @Test
     void shouldReturnAllCategories() {

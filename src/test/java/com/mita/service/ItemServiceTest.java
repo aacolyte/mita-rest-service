@@ -18,8 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -83,8 +82,18 @@ public class ItemServiceTest {
         assertEquals("true",result.getAdditionalInfo());
         assertEquals(10.0,result.getRating());
         verify(itemRepository, times(1)).findById(1L);
-
     }
+    @Test
+    void shouldThrowException_WhenItemDoesNotExist() {
+        when(itemRepository.findById(99L)).thenReturn(Optional.empty());
+
+        IllegalArgumentException ex = assertThrows(
+            IllegalArgumentException.class,
+            () -> itemService.getItemById(99L)
+        );
+        assertEquals("Item with id: " + 99L + " not found", ex.getMessage());
+    }
+
     @Test
     void shouldReturnAllItems(){
         Item item1 = new Item();
