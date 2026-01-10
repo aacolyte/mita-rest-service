@@ -12,6 +12,7 @@ import com.mita.repository.ItemRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -64,5 +65,26 @@ public class ItemService {
 
         itemRepository.deleteById(id);
     }
+
+
+
+
+
+    public ItemContainerDto getItemsByTitle(@RequestParam Long categoryId, @RequestParam String title) {
+        List<Item> items;
+
+        if(title == null || title.isBlank()) {
+            items = itemRepository.findByCategoryId(categoryId);
+        }else{
+            items = itemRepository.findByTCategoryIdAndTitleContainingIgnoreCase(categoryId, title);
+        }
+
+        List<ItemDto> dtoList = items.stream()
+                .map(Item::toDto)
+                .collect(Collectors.toList());
+
+        return new ItemContainerDto(dtoList);
+    }
+
 
 }

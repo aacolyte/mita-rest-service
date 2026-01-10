@@ -50,4 +50,11 @@ public class ItemController {
     }
 
 
+
+    @ResponseBody
+    @GetMapping
+    public void getItemByTitle(@RequestParam Long categoryId, @RequestParam String title) {
+        itemService.getItemsByTitle(categoryId, title);
+    }
+
 }
