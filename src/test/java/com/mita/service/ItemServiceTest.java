@@ -150,4 +150,51 @@ public class ItemServiceTest {
         verify(itemRepository,times(1)).deleteById(1L);
     }
 
+    @Test
+    void shouldReturnItemsByTitle(){
+        Item item2 = new Item();
+        item2.setTitle("Some game2");
+        item2.setId(2L);
+        item2.setRating(7.5);
+        item2.setAdditionalInfo("false");
+        item2.setCategory(savedCategory);
+
+        Item item3 = new Item();
+        item3.setTitle("game2");
+        item3.setId(3L);
+        item3.setRating(8.0);
+        item3.setAdditionalInfo("false");
+        item3.setCategory(savedCategory);
+
+        when(itemRepository.findByCategoryIdAndTitleContainingIgnoreCase(1L,"2"))
+                .thenReturn(List.of(item2, item3));
+
+        ItemContainerDto result = itemService.getItemsByTitle(1L,"2");
+
+        assertNotNull(result);
+        assertEquals(2,result.getAllItems().size());
+
+        assertEquals("Some game2",result.getAllItems().get(0).getTitle());
+        assertEquals("false",result.getAllItems().get(0).getAdditionalInfo());
+        assertEquals(7.5,result.getAllItems().get(0).getRating());
+
+        assertEquals("game2",result.getAllItems().get(1).getTitle());
+        assertEquals("false",result.getAllItems().get(1).getAdditionalInfo());
+        assertEquals(8.0,result.getAllItems().get(1).getRating());
+
+        verify(itemRepository, times(1)).findByCategoryIdAndTitleContainingIgnoreCase(1L,"2");
+    }
+    @Test
+    void shouldReturnEmptyList_whenNoItemsFoundByTitle() {
+        when(itemRepository.findByCategoryIdAndTitleContainingIgnoreCase(1L,"game"))
+                .thenReturn(List.of());
+
+        ItemContainerDto result = itemService.getItemsByTitle(1L,"game");
+
+        assertNotNull(result);
+        assertTrue(result.getAllItems().isEmpty());
+    }
+
+
+
 }

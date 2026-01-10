@@ -76,7 +76,7 @@ public class ItemService {
         if(title == null || title.isBlank()) {
             items = itemRepository.findByCategoryId(categoryId);
         }else{
-            items = itemRepository.findByTCategoryIdAndTitleContainingIgnoreCase(categoryId, title);
+            items = itemRepository.findByCategoryIdAndTitleContainingIgnoreCase(categoryId, title);
         }
 
         List<ItemDto> dtoList = items.stream()
