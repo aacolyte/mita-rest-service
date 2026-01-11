@@ -195,6 +195,51 @@ public class ItemServiceTest {
         assertTrue(result.getAllItems().isEmpty());
     }
 
+    @Test
+    void shouldReturnItemByRating() {
+        Item item2 = new Item();
+        item2.setTitle("Some game2");
+        item2.setId(2L);
+        item2.setRating(7.5);
+        item2.setAdditionalInfo("false");
+        item2.setCategory(savedCategory);
 
+        when(itemRepository.findByCategoryIdAndRating(1L,7.5))
+                .thenReturn((List.of(item2)));
+
+        ItemContainerDto result = itemService.getItemsByRating(1L,7.5);
+
+        assertNotNull(result);
+        assertEquals(1,result.getAllItems().size());
+
+        assertEquals("Some game2",result.getAllItems().get(0).getTitle());
+        assertEquals("false",result.getAllItems().get(0).getAdditionalInfo());
+        assertEquals(7.5,result.getAllItems().get(0).getRating());
+
+        verify(itemRepository, times(1)).findByCategoryIdAndRating(1L,7.5);
+    }
+
+    @Test
+    void shouldReturnEmptyList_whenNoItemsFoundByRating() {
+        when(itemRepository.findByCategoryIdAndRating(1L,7.5))
+                .thenReturn(List.of());
+
+        ItemContainerDto result = itemService.getItemsByRating(1L,7.5);
+
+        assertNotNull(result);
+        assertTrue(result.getAllItems().isEmpty());
+    }
+    @Test
+    void shouldReturnAllItemsByCategory_whenRatingIsNull() {
+        when(itemRepository.findByCategoryId(1L))
+                .thenReturn(List.of(savedItem));
+
+        ItemContainerDto result = itemService.getItemsByRating(1L, null);
+
+        assertEquals(1, result.getAllItems().size());
+
+        verify(itemRepository, times(1)).findByCategoryId(1L);
+        verify(itemRepository, never()).findByCategoryIdAndRating(any(), any());
+    }
 
 }

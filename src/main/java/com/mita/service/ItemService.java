@@ -70,7 +70,7 @@ public class ItemService {
 
 
 
-    public ItemContainerDto getItemsByTitle(@RequestParam Long categoryId, @RequestParam String title) {
+    public ItemContainerDto getItemsByTitle(Long categoryId, String title) {
         List<Item> items;
 
         if(title == null || title.isBlank()) {
@@ -86,5 +86,22 @@ public class ItemService {
         return new ItemContainerDto(dtoList);
     }
 
+
+    public ItemContainerDto getItemsByRating(Long categoryId,Double rating) {
+        List<Item> items;
+
+        if(rating == null) {
+            items = itemRepository.findByCategoryId(categoryId);
+        }else{
+            items = itemRepository.findByCategoryIdAndRating(categoryId, rating);
+        }
+
+        List<ItemDto> dtoList = items.stream()
+                .map(Item::toDto)
+                .collect(Collectors.toList());
+
+        return new ItemContainerDto(dtoList);
+
+    }
 
 }
