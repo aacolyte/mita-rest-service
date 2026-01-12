@@ -62,4 +62,9 @@ public class ItemController {
     public void getItemByRating(@RequestParam Long categoryId, @RequestParam Double rating) {
         itemService.getItemsByRating(categoryId, rating);
     }
+
+    @GetMapping
+    public void getItemsWithRatingGreaterThan(@RequestParam Long categoryId, @RequestParam Double rating) {
+        itemService.getItemsWithRatingGreaterThan(categoryId, rating);
+    }
 }

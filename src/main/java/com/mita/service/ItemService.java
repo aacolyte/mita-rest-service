@@ -101,7 +101,24 @@ public class ItemService {
                 .collect(Collectors.toList());
 
         return new ItemContainerDto(dtoList);
+    }
+
+    public ItemContainerDto getItemsWithRatingGreaterThan(Long categoryId,Double rating) {
+        List<Item> items;
+
+        if(rating == null) {
+            items = itemRepository.findByCategoryId(categoryId);
+        }else{
+            items = itemRepository.findByCategoryIdAndRatingGreaterThanEqual(categoryId, rating);
+        }
+        List<ItemDto> dtoList = items.stream()
+                .map(Item::toDto)
+                .collect(Collectors.toList());
+
+        return new ItemContainerDto(dtoList);
+
 
     }
+
 
 }

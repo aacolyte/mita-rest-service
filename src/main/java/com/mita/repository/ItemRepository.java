@@ -15,4 +15,6 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
 
 
     List<Item> findByCategoryIdAndRating(Long categoryId, Double rating);
+
+    List<Item> findByCategoryIdAndRatingGreaterThanEqual(Long categoryId, Double rating);
 }
