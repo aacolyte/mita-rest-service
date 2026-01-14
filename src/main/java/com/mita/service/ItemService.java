@@ -1,6 +1,7 @@
 package com.mita.service;
 
 
+import com.mita.dto.CategoryDto;
 import com.mita.dto.ItemContainerDto;
 import com.mita.dto.ItemDto;
 import com.mita.dto.request.ItemCreateRequest;
@@ -22,12 +23,14 @@ import java.util.stream.Collectors;
 public class ItemService {
 
     private final CategoryRepository categoryRepository;
+    private final CategoryService categoryService;
     private ItemRepository itemRepository;
 
     @Autowired
-    public ItemService(ItemRepository itemRepository, CategoryRepository categoryRepository) {
+    public ItemService(ItemRepository itemRepository, CategoryRepository categoryRepository, CategoryService categoryService) {
         this.itemRepository = itemRepository;
         this.categoryRepository = categoryRepository;
+        this.categoryService = categoryService;
     }
 
 
@@ -136,6 +139,21 @@ public class ItemService {
         return new ItemContainerDto(dtoList);
     }
 
+    public ItemContainerDto getItemsByAdditionalInfo(Long categoryId, String additionalInfo) {
+        CategoryDto category = categoryService.getCategoryById(categoryId);
+        List<Item> items;
+        if(category.getName().equalsIgnoreCase("Game")) {
+            items = itemRepository.findByCategoryIdAndAdditionalInfo(categoryId, additionalInfo);
+        }else{
+             items = itemRepository.findByCategoryIdAndAdditionalInfoContainingIgnoreCase(categoryId, additionalInfo);
+        }
 
+        List<ItemDto> dtoList = items.stream()
+                .map(Item::toDto)
+                .collect(Collectors.toList());
+
+        return new ItemContainerDto(dtoList);
+
+    }
 
 }

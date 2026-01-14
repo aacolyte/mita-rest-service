@@ -25,4 +25,10 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             nativeQuery = true
     )
     List<Item> findTopItemsByRating(@Param("categoryId") Long categoryId, @Param("limit") Integer limit);
+
+    List<Item> findByCategoryIdAndAdditionalInfoContainingIgnoreCase(Long categoryId, String genre);
+
+    List<Item> findByCategoryIdAndAdditionalInfo(Long categoryId, String died);
+
+
 }

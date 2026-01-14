@@ -73,6 +73,10 @@ public class ItemController {
         return itemService.getTopItemsByRating(categoryId, limit);
     }
 
+    @GetMapping("/by-additional-info")
+    public ItemContainerDto getItemsByAdditionalInfo(@RequestParam Long categoryId, @RequestParam String additionalInfo) {
+        return itemService.getItemsByAdditionalInfo(categoryId, additionalInfo);
+    }
 
 
 }
