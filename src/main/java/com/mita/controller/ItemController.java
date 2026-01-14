@@ -67,4 +67,9 @@ public class ItemController {
     public void getItemsWithRatingGreaterThan(@RequestParam Long categoryId, @RequestParam Double rating) {
         itemService.getItemsWithRatingGreaterThan(categoryId, rating);
     }
+
+    public void getTopItemsByRating(@RequestParam Long categoryId, @RequestParam Integer limit) {
+        itemService.getTopItemsByRating(categoryId, limit);
+    }
+
 }

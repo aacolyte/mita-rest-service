@@ -120,5 +120,21 @@ public class ItemService {
 
     }
 
+    public ItemContainerDto getTopItemsByRating(Long categoryId, Integer limit) {
+        List<Item> items;
+
+        if(limit == null) {
+            items = itemRepository.findByCategoryId(categoryId);
+        }else{
+            items = itemRepository.findTopItemsByRating(categoryId, limit);
+        }
+
+        List<ItemDto> dtoList = items.stream()
+                .map(Item::toDto)
+                .collect(Collectors.toList());
+
+        return new ItemContainerDto(dtoList);
+    }
+
 
 }

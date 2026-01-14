@@ -277,4 +277,41 @@ public class ItemServiceTest {
         verify(itemRepository, times(1)).findByCategoryIdAndRatingGreaterThanEqual(1L,7.5);
     }
 
+
+    @Test
+    void shouldReturnTopItemsByRating() {
+        Item item2 = new Item();
+        item2.setTitle("Some game2");
+        item2.setId(2L);
+        item2.setRating(7.5);
+        item2.setAdditionalInfo("false");
+        item2.setCategory(savedCategory);
+
+        Item item3 = new Item();
+        item3.setTitle("game2");
+        item3.setId(3L);
+        item3.setRating(8.0);
+        item3.setAdditionalInfo("false");
+        item3.setCategory(savedCategory);
+
+        when(itemRepository.findTopItemsByRating(1L,2))
+                .thenReturn(List.of(item3, item2));
+
+        ItemContainerDto result = itemService.getTopItemsByRating(1L,2);
+
+        assertNotNull(result);
+        assertEquals(2,result.getAllItems().size());
+
+        assertEquals("game2",result.getAllItems().get(0).getTitle());
+        assertEquals("false",result.getAllItems().get(0).getAdditionalInfo());
+        assertEquals(8.0,result.getAllItems().get(0).getRating());
+
+        assertEquals("Some game2",result.getAllItems().get(1).getTitle());
+        assertEquals("false",result.getAllItems().get(1).getAdditionalInfo());
+        assertEquals(7.5,result.getAllItems().get(1).getRating());
+
+        verify(itemRepository, times(1)).findTopItemsByRating(1L,2);
+    }
+
+
 }
