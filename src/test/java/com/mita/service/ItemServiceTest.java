@@ -30,6 +30,9 @@ public class ItemServiceTest {
     @Mock
     private CategoryRepository categoryRepository;
 
+    @Mock
+    private CategoryService categoryService;
+
     @InjectMocks
     private ItemService itemService;
 
@@ -313,5 +316,54 @@ public class ItemServiceTest {
         verify(itemRepository, times(1)).findTopItemsByRating(1L,2);
     }
 
+    @Test
+    void shouldReturnGameItemByDied() {
+        Category category = new Category();
+        category.setId(2L);
+        category.setName("Game");
+
+        Item item2 = new Item();
+        item2.setTitle("Game2");
+        item2.setId(2L);
+        item2.setRating(7.5);
+        item2.setAdditionalInfo("true");
+        item2.setCategory(category);
+
+        when(categoryService.getCategoryById(2L))
+                .thenReturn(category.toDto());
+
+        when(itemRepository.findByCategoryIdAndAdditionalInfo(2L, "true"))
+                .thenReturn(List.of(item2));
+
+        ItemContainerDto result = itemService.getItemsByAdditionalInfo(2L, "true");
+
+        assertNotNull(result);
+        assertEquals(1, result.getAllItems().size());
+        assertEquals("true", result.getAllItems().get(0).getAdditionalInfo());
+        assertEquals("Game2", result.getAllItems().get(0).getTitle());
+    }
+
+    @Test
+    void shouldReturnMovieItemByGenre() {
+        Item item3 = new Item();
+        item3.setTitle("Movie1");
+        item3.setId(3L);
+        item3.setRating(8.0);
+        item3.setAdditionalInfo("romantic");
+        item3.setCategory(savedCategory);
+
+        when(categoryService.getCategoryById(1L))
+                .thenReturn(savedCategory.toDto());
+
+        when(itemRepository.findByCategoryIdAndAdditionalInfoContainingIgnoreCase(1L, "romantic"))
+                .thenReturn(List.of(item3));
+
+        ItemContainerDto result = itemService.getItemsByAdditionalInfo(1L, "romantic");
+
+        assertNotNull(result);
+        assertEquals(1, result.getAllItems().size());
+        assertEquals("romantic", result.getAllItems().get(0).getAdditionalInfo());
+        assertEquals("Movie1", result.getAllItems().get(0).getTitle());
+    }
 
 }
