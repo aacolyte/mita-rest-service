@@ -53,24 +53,24 @@ public class ItemController {
 
 
     @GetMapping("/by-title")
-    public void getItemByTitle(@RequestParam Long categoryId, @RequestParam String title) {
-        itemService.getItemsByTitle(categoryId, title);
+    public ItemContainerDto getItemByTitle(@RequestParam Long categoryId, @RequestParam String title) {
+        return itemService.getItemsByTitle(categoryId, title);
     }
 
 
     @GetMapping("by-rating")
-    public void getItemByRating(@RequestParam Long categoryId, @RequestParam Double rating) {
-        itemService.getItemsByRating(categoryId, rating);
+    public ItemContainerDto getItemByRating(@RequestParam Long categoryId, @RequestParam Double rating) {
+        return itemService.getItemsByRating(categoryId, rating);
     }
 
     @GetMapping("/rating-above")
-    public void getItemsWithRatingGreaterThan(@RequestParam Long categoryId, @RequestParam Double rating) {
-        itemService.getItemsWithRatingGreaterThan(categoryId, rating);
+    public ItemContainerDto getItemsWithRatingGreaterThan(@RequestParam Long categoryId, @RequestParam Double rating) {
+        return itemService.getItemsWithRatingGreaterThan(categoryId, rating);
     }
 
     @GetMapping("/top")
-    public void getTopItemsByRating(@RequestParam Long categoryId, @RequestParam Integer limit) {
-        itemService.getTopItemsByRating(categoryId, limit);
+    public ItemContainerDto getTopItemsByRating(@RequestParam Long categoryId, @RequestParam Integer limit) {
+        return itemService.getTopItemsByRating(categoryId, limit);
     }
 
 
