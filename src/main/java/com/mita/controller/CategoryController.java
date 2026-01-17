@@ -2,7 +2,6 @@ package com.mita.controller;
 
 
 import com.mita.dto.CategoryContainerDto;
-
 import com.mita.dto.CategoryDto;
 import com.mita.dto.request.CategoryCreateRequest;
 import com.mita.dto.request.CategoryUpdateRequest;
@@ -10,8 +9,6 @@ import com.mita.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Controller
 @RequestMapping("/api/categories")
@@ -26,7 +23,7 @@ public class CategoryController {
 
     @ResponseBody
     @GetMapping
-    public CategoryContainerDto getCategoryList() {
+    public CategoryContainerDto getAllCategories() {
         return categoryService.getAllCategories();
     }
 

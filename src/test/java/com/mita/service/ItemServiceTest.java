@@ -344,7 +344,7 @@ public class ItemServiceTest {
     }
 
     @Test
-    void shouldReturnMovieItemByGenre() {
+    void shouldReturnItemByGenre() {
         Item item3 = new Item();
         item3.setTitle("Movie1");
         item3.setId(3L);
@@ -364,6 +364,19 @@ public class ItemServiceTest {
         assertEquals(1, result.getAllItems().size());
         assertEquals("romantic", result.getAllItems().get(0).getAdditionalInfo());
         assertEquals("Movie1", result.getAllItems().get(0).getTitle());
+    }
+
+    @Test
+    void shouldReturnAllItemsByCategory(){
+
+        when(itemRepository.findByCategoryId(1L)).thenReturn(List.of(savedItem));
+
+        ItemContainerDto result = itemService.getItemsByCategory(1L);
+
+        assertNotNull(result);
+        assertEquals(1, result.getAllItems().size());
+        assertEquals("Some game", result.getAllItems().get(0).getTitle());
+
     }
 
 }

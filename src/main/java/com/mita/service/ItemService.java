@@ -13,7 +13,6 @@ import com.mita.repository.ItemRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -147,6 +146,20 @@ public class ItemService {
         }else{
              items = itemRepository.findByCategoryIdAndAdditionalInfoContainingIgnoreCase(categoryId, additionalInfo);
         }
+
+        List<ItemDto> dtoList = items.stream()
+                .map(Item::toDto)
+                .collect(Collectors.toList());
+
+        return new ItemContainerDto(dtoList);
+
+    }
+
+
+    public ItemContainerDto getItemsByCategory(Long categoryId) {
+        List<Item> items;
+
+        items = itemRepository.findByCategoryId(categoryId);
 
         List<ItemDto> dtoList = items.stream()
                 .map(Item::toDto)

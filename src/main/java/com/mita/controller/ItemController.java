@@ -79,4 +79,10 @@ public class ItemController {
     }
 
 
+    @GetMapping("by-category")
+    public ItemContainerDto getItemsByCategory(@RequestParam Long categoryId) {
+        return itemService.getItemsByCategory(categoryId);
+    }
+
+
 }

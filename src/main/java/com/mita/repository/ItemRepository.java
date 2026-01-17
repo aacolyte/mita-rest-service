@@ -21,7 +21,7 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     List<Item> findByCategoryIdAndRatingGreaterThanEqual(Long categoryId, Double rating);
 
     @Query(
-            value = "SELECT * FROM item WHERE category_id = :categoryId ORDER BY rating DESC LIMIT :limit",
+            value = "SELECT * FROM items WHERE category_id = :categoryId ORDER BY rating DESC LIMIT :limit",
             nativeQuery = true
     )
     List<Item> findTopItemsByRating(@Param("categoryId") Long categoryId, @Param("limit") Integer limit);
