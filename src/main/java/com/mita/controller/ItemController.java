@@ -20,11 +20,26 @@ public class ItemController {
     }
 
 
-    @GetMapping
-    public ItemContainerDto getAllItems(){
-        return itemService.getAllItems();
-    }
 
+    @GetMapping
+    public ItemContainerDto getItems(
+            @RequestParam Long categoryId,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) Double rating,
+            @RequestParam(required = false) Double ratingAbove,
+            @RequestParam(required = false) String additionalInfo,
+
+            @RequestParam(required = false, defaultValue = "rating,desc") String sort
+            ) {
+        return itemService.getItems(
+                categoryId,
+                title,
+                rating,
+                ratingAbove,
+                additionalInfo,
+                sort
+        );
+    }
 
     @GetMapping("/{id}")
     public ItemDto getItemById(@PathVariable Long id){
@@ -52,37 +67,7 @@ public class ItemController {
 
 
 
-    @GetMapping("/by-title")
-    public ItemContainerDto getItemByTitle(@RequestParam Long categoryId, @RequestParam String title) {
-        return itemService.getItemsByTitle(categoryId, title);
-    }
 
-
-    @GetMapping("by-rating")
-    public ItemContainerDto getItemByRating(@RequestParam Long categoryId, @RequestParam Double rating) {
-        return itemService.getItemsByRating(categoryId, rating);
-    }
-
-    @GetMapping("/rating-above")
-    public ItemContainerDto getItemsWithRatingGreaterThan(@RequestParam Long categoryId, @RequestParam Double rating) {
-        return itemService.getItemsWithRatingGreaterThan(categoryId, rating);
-    }
-
-    @GetMapping("/top")
-    public ItemContainerDto getTopItemsByRating(@RequestParam Long categoryId, @RequestParam Integer limit) {
-        return itemService.getTopItemsByRating(categoryId, limit);
-    }
-
-    @GetMapping("/by-additional-info")
-    public ItemContainerDto getItemsByAdditionalInfo(@RequestParam Long categoryId, @RequestParam String additionalInfo) {
-        return itemService.getItemsByAdditionalInfo(categoryId, additionalInfo);
-    }
-
-
-    @GetMapping("by-category")
-    public ItemContainerDto getItemsByCategory(@RequestParam Long categoryId) {
-        return itemService.getItemsByCategory(categoryId);
-    }
 
 
 }

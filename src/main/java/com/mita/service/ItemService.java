@@ -1,7 +1,6 @@
 package com.mita.service;
 
 
-import com.mita.dto.CategoryDto;
 import com.mita.dto.ItemContainerDto;
 import com.mita.dto.ItemDto;
 import com.mita.dto.request.ItemCreateRequest;
@@ -10,12 +9,13 @@ import com.mita.entity.Category;
 import com.mita.entity.Item;
 import com.mita.repository.CategoryRepository;
 import com.mita.repository.ItemRepository;
+import com.mita.specification.ItemSpecification;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -33,12 +33,46 @@ public class ItemService {
     }
 
 
-    public ItemContainerDto getAllItems() {
-        List<ItemDto> itemList = itemRepository.findAll().stream()
-                .map(Item::toDto)
-                .collect(Collectors.toList());
-        return new ItemContainerDto(itemList);
+    public ItemContainerDto getItems(
+            Long categoryId,
+            String title,
+            Double rating,
+            Double ratingAbove,
+            String additionalInfo,
+            String sort
+    ) {
+        Sort sorting = parseSort(sort);
+
+
+        List<ItemDto> items = itemRepository.findAll(
+                ItemSpecification.withFilters(
+                categoryId,
+                title,
+                rating,
+                ratingAbove,
+                additionalInfo
+                ),
+                sorting
+        ).stream().map(Item::toDto).toList();
+
+
+
+        return new ItemContainerDto(items);
     }
+
+    private Sort parseSort(String sort) {
+        String[] parts = sort.split(",");
+
+        String field = parts[0];
+        Sort.Direction direction =
+                parts.length > 1 && parts[1].equalsIgnoreCase("asc")
+                        ? Sort.Direction.ASC
+                        : Sort.Direction.DESC;
+
+        return Sort.by(direction, field);
+    }
+
+
 
     public ItemDto getItemById(Long id) {
         return itemRepository.findById(id)
@@ -72,101 +106,8 @@ public class ItemService {
 
 
 
-    public ItemContainerDto getItemsByTitle(Long categoryId, String title) {
-        List<Item> items;
-
-        if(title == null || title.isBlank()) {
-            items = itemRepository.findByCategoryId(categoryId);
-        }else{
-            items = itemRepository.findByCategoryIdAndTitleContainingIgnoreCase(categoryId, title);
-        }
-
-        List<ItemDto> dtoList = items.stream()
-                .map(Item::toDto)
-                .collect(Collectors.toList());
-
-        return new ItemContainerDto(dtoList);
-    }
 
 
-    public ItemContainerDto getItemsByRating(Long categoryId,Double rating) {
-        List<Item> items;
 
-        if(rating == null) {
-            items = itemRepository.findByCategoryId(categoryId);
-        }else{
-            items = itemRepository.findByCategoryIdAndRating(categoryId, rating);
-        }
-
-        List<ItemDto> dtoList = items.stream()
-                .map(Item::toDto)
-                .collect(Collectors.toList());
-
-        return new ItemContainerDto(dtoList);
-    }
-
-    public ItemContainerDto getItemsWithRatingGreaterThan(Long categoryId,Double rating) {
-        List<Item> items;
-
-        if(rating == null) {
-            items = itemRepository.findByCategoryId(categoryId);
-        }else{
-            items = itemRepository.findByCategoryIdAndRatingGreaterThanEqual(categoryId, rating);
-        }
-        List<ItemDto> dtoList = items.stream()
-                .map(Item::toDto)
-                .collect(Collectors.toList());
-
-        return new ItemContainerDto(dtoList);
-
-
-    }
-
-    public ItemContainerDto getTopItemsByRating(Long categoryId, Integer limit) {
-        List<Item> items;
-
-        if(limit == null) {
-            items = itemRepository.findByCategoryId(categoryId);
-        }else{
-            items = itemRepository.findTopItemsByRating(categoryId, limit);
-        }
-
-        List<ItemDto> dtoList = items.stream()
-                .map(Item::toDto)
-                .collect(Collectors.toList());
-
-        return new ItemContainerDto(dtoList);
-    }
-
-    public ItemContainerDto getItemsByAdditionalInfo(Long categoryId, String additionalInfo) {
-        CategoryDto category = categoryService.getCategoryById(categoryId);
-        List<Item> items;
-        if(category.getName().equalsIgnoreCase("Game")) {
-            items = itemRepository.findByCategoryIdAndAdditionalInfo(categoryId, additionalInfo);
-        }else{
-             items = itemRepository.findByCategoryIdAndAdditionalInfoContainingIgnoreCase(categoryId, additionalInfo);
-        }
-
-        List<ItemDto> dtoList = items.stream()
-                .map(Item::toDto)
-                .collect(Collectors.toList());
-
-        return new ItemContainerDto(dtoList);
-
-    }
-
-
-    public ItemContainerDto getItemsByCategory(Long categoryId) {
-        List<Item> items;
-
-        items = itemRepository.findByCategoryId(categoryId);
-
-        List<ItemDto> dtoList = items.stream()
-                .map(Item::toDto)
-                .collect(Collectors.toList());
-
-        return new ItemContainerDto(dtoList);
-
-    }
 
 }

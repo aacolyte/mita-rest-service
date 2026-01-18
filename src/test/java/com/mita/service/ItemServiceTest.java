@@ -14,6 +14,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 import java.util.Optional;
@@ -98,39 +100,6 @@ public class ItemServiceTest {
     }
 
     @Test
-    void shouldReturnAllItems(){
-        Item item1 = new Item();
-        item1.setTitle("Some game1");
-        item1.setId(1L);
-        item1.setRating(10.0);
-        item1.setAdditionalInfo("true");
-        item1.setCategory(savedCategory);
-
-        Item item2 = new Item();
-        item2.setTitle("Some game2");
-        item2.setId(2L);
-        item2.setRating(7.5);
-        item2.setAdditionalInfo("false");
-        item2.setCategory(savedCategory);
-
-        when(itemRepository.findAll()).thenReturn(List.of(item1,item2));
-
-        ItemContainerDto result = itemService.getAllItems();
-
-        assertNotNull(result);
-        assertEquals(2,result.getAllItems().size());
-
-        assertEquals("Some game1",result.getAllItems().get(0).getTitle());
-        assertEquals("true",result.getAllItems().get(0).getAdditionalInfo());
-        assertEquals(10.0,result.getAllItems().get(0).getRating());
-
-        assertEquals("Some game2",result.getAllItems().get(1).getTitle());
-        assertEquals("false",result.getAllItems().get(1).getAdditionalInfo());
-        assertEquals(7.5,result.getAllItems().get(1).getRating());
-
-        verify(itemRepository, times(1)).findAll();
-    }
-    @Test
     void shouldUpdateItem_whenItemExists() {
         ItemUpdateRequest request = new ItemUpdateRequest("New title",7.5,"false");
 
@@ -154,229 +123,95 @@ public class ItemServiceTest {
     }
 
     @Test
-    void shouldReturnItemsByTitle(){
+    void shouldReturnItemsFilteredByTitle() {
         Item item2 = new Item();
-        item2.setTitle("Some game2");
         item2.setId(2L);
-        item2.setRating(7.5);
+        item2.setTitle("Game 2");
+        item2.setRating(7.0);
         item2.setAdditionalInfo("false");
         item2.setCategory(savedCategory);
 
-        Item item3 = new Item();
-        item3.setTitle("game2");
-        item3.setId(3L);
-        item3.setRating(8.0);
-        item3.setAdditionalInfo("false");
-        item3.setCategory(savedCategory);
+        when(itemRepository.findAll(any(Specification.class), any(Sort.class)))
+                .thenReturn(List.of(savedItem, item2));
 
-        when(itemRepository.findByCategoryIdAndTitleContainingIgnoreCase(1L,"2"))
-                .thenReturn(List.of(item2, item3));
+        ItemContainerDto result = itemService.getItems(
+                1L, "game", null, null, null, String.valueOf(Sort.by(Sort.Direction.DESC, "rating"))
+        );
 
-        ItemContainerDto result = itemService.getItemsByTitle(1L,"2");
 
         assertNotNull(result);
-        assertEquals(2,result.getAllItems().size());
-
-        assertEquals("Some game2",result.getAllItems().get(0).getTitle());
-        assertEquals("false",result.getAllItems().get(0).getAdditionalInfo());
-        assertEquals(7.5,result.getAllItems().get(0).getRating());
-
-        assertEquals("game2",result.getAllItems().get(1).getTitle());
-        assertEquals("false",result.getAllItems().get(1).getAdditionalInfo());
-        assertEquals(8.0,result.getAllItems().get(1).getRating());
-
-        verify(itemRepository, times(1)).findByCategoryIdAndTitleContainingIgnoreCase(1L,"2");
-    }
-    @Test
-    void shouldReturnEmptyList_whenNoItemsFoundByTitle() {
-        when(itemRepository.findByCategoryIdAndTitleContainingIgnoreCase(1L,"game"))
-                .thenReturn(List.of());
-
-        ItemContainerDto result = itemService.getItemsByTitle(1L,"game");
-
-        assertNotNull(result);
-        assertTrue(result.getAllItems().isEmpty());
+        assertEquals(2, result.getAllItems().size());
+        assertTrue(result.getAllItems().get(0).getRating() >= result.getAllItems().get(1).getRating());
     }
 
     @Test
-    void shouldReturnItemByRating() {
+    void shouldReturnItemsFilteredByRatingAbove() {
         Item item2 = new Item();
-        item2.setTitle("Some game2");
         item2.setId(2L);
-        item2.setRating(7.5);
+        item2.setTitle("Game 2");
+        item2.setRating(10.0);
         item2.setAdditionalInfo("false");
         item2.setCategory(savedCategory);
 
-        when(itemRepository.findByCategoryIdAndRating(1L,7.5))
-                .thenReturn((List.of(item2)));
+        when(itemRepository.findAll(any(Specification.class), any(Sort.class)))
+                .thenReturn(List.of(savedItem, item2));
 
-        ItemContainerDto result = itemService.getItemsByRating(1L,7.5);
+        ItemContainerDto result = itemService.getItems(
+                1L, null, null, 9.0, null, String.valueOf(Sort.by(Sort.Direction.DESC, "rating"))
+        );
 
         assertNotNull(result);
-        assertEquals(1,result.getAllItems().size());
-
-        assertEquals("Some game2",result.getAllItems().get(0).getTitle());
-        assertEquals("false",result.getAllItems().get(0).getAdditionalInfo());
-        assertEquals(7.5,result.getAllItems().get(0).getRating());
-
-        verify(itemRepository, times(1)).findByCategoryIdAndRating(1L,7.5);
+        assertEquals(2, result.getAllItems().size());
+        assertTrue(result.getAllItems().stream().allMatch(i -> i.getRating() >= 9.0));
     }
 
     @Test
-    void shouldReturnEmptyList_whenNoItemsFoundByRating() {
-        when(itemRepository.findByCategoryIdAndRating(1L,7.5))
-                .thenReturn(List.of());
-
-        ItemContainerDto result = itemService.getItemsByRating(1L,7.5);
-
-        assertNotNull(result);
-        assertTrue(result.getAllItems().isEmpty());
-    }
-    @Test
-    void shouldReturnAllItemsByCategory_whenRatingIsNull() {
-        when(itemRepository.findByCategoryId(1L))
+    void shouldReturnItemsFilteredByAdditionalInfo() {
+        when(itemRepository.findAll(any(Specification.class), any(Sort.class)))
                 .thenReturn(List.of(savedItem));
 
-        ItemContainerDto result = itemService.getItemsByRating(1L, null);
-
-        assertEquals(1, result.getAllItems().size());
-
-        verify(itemRepository, times(1)).findByCategoryId(1L);
-        verify(itemRepository, never()).findByCategoryIdAndRating(any(), any());
-    }
-
-    @Test
-    void shouldReturnItemsWithRatingGreaterThan() {
-        Item item2 = new Item();
-        item2.setTitle("Some game2");
-        item2.setId(2L);
-        item2.setRating(7.5);
-        item2.setAdditionalInfo("false");
-        item2.setCategory(savedCategory);
-
-        Item item3 = new Item();
-        item3.setTitle("game2");
-        item3.setId(3L);
-        item3.setRating(8.0);
-        item3.setAdditionalInfo("false");
-        item3.setCategory(savedCategory);
-
-        when(itemRepository.findByCategoryIdAndRatingGreaterThanEqual(1L,7.5))
-                .thenReturn(List.of(item2, item3));
-
-        ItemContainerDto result = itemService.getItemsWithRatingGreaterThan(1L,7.5);
-
-        assertNotNull(result);
-        assertEquals(2,result.getAllItems().size());
-
-        assertEquals("Some game2",result.getAllItems().get(0).getTitle());
-        assertEquals("false",result.getAllItems().get(0).getAdditionalInfo());
-        assertEquals(7.5,result.getAllItems().get(0).getRating());
-
-        assertEquals("game2",result.getAllItems().get(1).getTitle());
-        assertEquals("false",result.getAllItems().get(1).getAdditionalInfo());
-        assertEquals(8.0,result.getAllItems().get(1).getRating());
-
-        verify(itemRepository, times(1)).findByCategoryIdAndRatingGreaterThanEqual(1L,7.5);
-    }
-
-
-    @Test
-    void shouldReturnTopItemsByRating() {
-        Item item2 = new Item();
-        item2.setTitle("Some game2");
-        item2.setId(2L);
-        item2.setRating(7.5);
-        item2.setAdditionalInfo("false");
-        item2.setCategory(savedCategory);
-
-        Item item3 = new Item();
-        item3.setTitle("game2");
-        item3.setId(3L);
-        item3.setRating(8.0);
-        item3.setAdditionalInfo("false");
-        item3.setCategory(savedCategory);
-
-        when(itemRepository.findTopItemsByRating(1L,2))
-                .thenReturn(List.of(item3, item2));
-
-        ItemContainerDto result = itemService.getTopItemsByRating(1L,2);
-
-        assertNotNull(result);
-        assertEquals(2,result.getAllItems().size());
-
-        assertEquals("game2",result.getAllItems().get(0).getTitle());
-        assertEquals("false",result.getAllItems().get(0).getAdditionalInfo());
-        assertEquals(8.0,result.getAllItems().get(0).getRating());
-
-        assertEquals("Some game2",result.getAllItems().get(1).getTitle());
-        assertEquals("false",result.getAllItems().get(1).getAdditionalInfo());
-        assertEquals(7.5,result.getAllItems().get(1).getRating());
-
-        verify(itemRepository, times(1)).findTopItemsByRating(1L,2);
-    }
-
-    @Test
-    void shouldReturnGameItemByDied() {
-        Category category = new Category();
-        category.setId(2L);
-        category.setName("Game");
-
-        Item item2 = new Item();
-        item2.setTitle("Game2");
-        item2.setId(2L);
-        item2.setRating(7.5);
-        item2.setAdditionalInfo("true");
-        item2.setCategory(category);
-
-        when(categoryService.getCategoryById(2L))
-                .thenReturn(category.toDto());
-
-        when(itemRepository.findByCategoryIdAndAdditionalInfo(2L, "true"))
-                .thenReturn(List.of(item2));
-
-        ItemContainerDto result = itemService.getItemsByAdditionalInfo(2L, "true");
+        ItemContainerDto result = itemService.getItems(
+                1L, null, null, null, "true", String.valueOf(Sort.by(Sort.Direction.ASC, "title"))
+        );
 
         assertNotNull(result);
         assertEquals(1, result.getAllItems().size());
         assertEquals("true", result.getAllItems().get(0).getAdditionalInfo());
-        assertEquals("Game2", result.getAllItems().get(0).getTitle());
     }
 
     @Test
-    void shouldReturnItemByGenre() {
-        Item item3 = new Item();
-        item3.setTitle("Movie1");
-        item3.setId(3L);
-        item3.setRating(8.0);
-        item3.setAdditionalInfo("romantic");
-        item3.setCategory(savedCategory);
+    void shouldReturnEmptyListWhenNoMatch() {
+        when(itemRepository.findAll(any(Specification.class), any(Sort.class)))
+                .thenReturn(List.of());
 
-        when(categoryService.getCategoryById(1L))
-                .thenReturn(savedCategory.toDto());
-
-        when(itemRepository.findByCategoryIdAndAdditionalInfoContainingIgnoreCase(1L, "romantic"))
-                .thenReturn(List.of(item3));
-
-        ItemContainerDto result = itemService.getItemsByAdditionalInfo(1L, "romantic");
+        ItemContainerDto result = itemService.getItems(
+                1L, "nonexistent", null, null, null, String.valueOf(Sort.by(Sort.Direction.ASC, "title"))
+        );
 
         assertNotNull(result);
-        assertEquals(1, result.getAllItems().size());
-        assertEquals("romantic", result.getAllItems().get(0).getAdditionalInfo());
-        assertEquals("Movie1", result.getAllItems().get(0).getTitle());
+        assertTrue(result.getAllItems().isEmpty());
     }
 
-    @Test
-    void shouldReturnAllItemsByCategory(){
 
-        when(itemRepository.findByCategoryId(1L)).thenReturn(List.of(savedItem));
 
-        ItemContainerDto result = itemService.getItemsByCategory(1L);
 
-        assertNotNull(result);
-        assertEquals(1, result.getAllItems().size());
-        assertEquals("Some game", result.getAllItems().get(0).getTitle());
 
-    }
+
+
+
+
+
+
+
+
 
 }
+
+
+
+
+
+
+
+
+
