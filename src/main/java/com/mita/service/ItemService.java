@@ -12,7 +12,10 @@ import com.mita.repository.ItemRepository;
 import com.mita.specification.ItemSpecification;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -39,22 +42,28 @@ public class ItemService {
             Double rating,
             Double ratingAbove,
             String additionalInfo,
+            Integer limit,
             String sort
     ) {
         Sort sorting = parseSort(sort);
 
-
-        List<ItemDto> items = itemRepository.findAll(
-                ItemSpecification.withFilters(
+        Specification<Item> spec = ItemSpecification.withFilters(
                 categoryId,
                 title,
                 rating,
                 ratingAbove,
                 additionalInfo
-                ),
-                sorting
-        ).stream().map(Item::toDto).toList();
+        );
+        List<ItemDto> items;
 
+        int safeLimit = (limit == null || limit <= 0)
+            ? 50
+            : Math.min(limit, 50);
+
+            Pageable pageable = PageRequest.of(0, safeLimit, sorting);
+            items = itemRepository.findAll(spec, pageable)
+                    .stream().map(Item::toDto)
+                    .toList();
 
 
         return new ItemContainerDto(items);
