@@ -14,7 +14,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
@@ -122,6 +123,9 @@ public class ItemServiceTest {
         verify(itemRepository,times(1)).deleteById(1L);
     }
 
+
+
+
     @Test
     void shouldReturnItemsFilteredByTitle() {
         Item item2 = new Item();
@@ -131,12 +135,11 @@ public class ItemServiceTest {
         item2.setAdditionalInfo("false");
         item2.setCategory(savedCategory);
 
-        when(itemRepository.findAll(any(Specification.class), any(Sort.class)))
-                .thenReturn(List.of(savedItem, item2));
+        when(itemRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(savedItem, item2)));
 
         ItemContainerDto result = itemService.getItems(
-                1L, "game", null, null, null, String.valueOf(Sort.by(Sort.Direction.DESC, "rating"))
-        );
+                1L, "game", null, null, null, 2,"rating,desc");
 
 
         assertNotNull(result);
@@ -153,12 +156,11 @@ public class ItemServiceTest {
         item2.setAdditionalInfo("false");
         item2.setCategory(savedCategory);
 
-        when(itemRepository.findAll(any(Specification.class), any(Sort.class)))
-                .thenReturn(List.of(savedItem, item2));
+        when(itemRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(savedItem, item2)));
 
         ItemContainerDto result = itemService.getItems(
-                1L, null, null, 9.0, null, String.valueOf(Sort.by(Sort.Direction.DESC, "rating"))
-        );
+                1L, null, null, 9.0, null, 2,"rating,desc");
 
         assertNotNull(result);
         assertEquals(2, result.getAllItems().size());
@@ -167,12 +169,11 @@ public class ItemServiceTest {
 
     @Test
     void shouldReturnItemsFilteredByAdditionalInfo() {
-        when(itemRepository.findAll(any(Specification.class), any(Sort.class)))
-                .thenReturn(List.of(savedItem));
+        when(itemRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(savedItem)));
 
         ItemContainerDto result = itemService.getItems(
-                1L, null, null, null, "true", String.valueOf(Sort.by(Sort.Direction.ASC, "title"))
-        );
+                1L, null, null, null, "true",1, "rating,desc");
 
         assertNotNull(result);
         assertEquals(1, result.getAllItems().size());
@@ -181,12 +182,11 @@ public class ItemServiceTest {
 
     @Test
     void shouldReturnEmptyListWhenNoMatch() {
-        when(itemRepository.findAll(any(Specification.class), any(Sort.class)))
-                .thenReturn(List.of());
+        when(itemRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of()));
 
         ItemContainerDto result = itemService.getItems(
-                1L, "nonexistent", null, null, null, String.valueOf(Sort.by(Sort.Direction.ASC, "title"))
-        );
+                1L, "nonexistent", null, null, null,1, "rating,desc");
 
         assertNotNull(result);
         assertTrue(result.getAllItems().isEmpty());
