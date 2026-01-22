@@ -60,7 +60,7 @@ public class ItemServiceTest {
 
     @Test
     void shouldCreateItem(){
-        request = new ItemCreateRequest("Some game", 10.0, "true", 1L);
+        request = new ItemCreateRequest("Some game", 10.0, "true", 1L, "some path");
 
         when(categoryRepository.findById(1L))
                 .thenReturn(Optional.of(savedCategory));
@@ -102,7 +102,7 @@ public class ItemServiceTest {
 
     @Test
     void shouldUpdateItem_whenItemExists() {
-        ItemUpdateRequest request = new ItemUpdateRequest("New title",7.5,"false");
+        ItemUpdateRequest request = new ItemUpdateRequest("New title",7.5,"false", "some path");
 
         when(itemRepository.findById(1L)).thenReturn(Optional.of(savedItem));
 

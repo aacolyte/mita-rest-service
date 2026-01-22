@@ -8,17 +8,23 @@ public class ItemDto {
     private final Double rating;
     private final String additionalInfo;
     private final Long categoryId;
+    private final String poster;
 
-    public ItemDto(Long id, String title, Double rating, String additionalInfo, Long categoryId) {
+    public ItemDto(Long id, String title, Double rating, String additionalInfo, Long categoryId, String poster) {
         this.id = id;
         this.title = title;
         this.rating = rating;
         this.additionalInfo = additionalInfo;
         this.categoryId = categoryId;
+        this.poster = poster;
     }
 
     public Long getId() {
         return id;
+    }
+
+    public String getPoster() {
+        return poster;
     }
 
     public String getTitle() {

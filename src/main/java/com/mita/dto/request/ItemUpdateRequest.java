@@ -13,11 +13,17 @@ public class ItemUpdateRequest {
     @DecimalMax(value = "10.0", inclusive = true)
     private final Double rating;
     private final String additionalInfo;
+    private final String poster;
 
-    public ItemUpdateRequest(String title, Double rating, String additionalInfo) {
+    public ItemUpdateRequest(String title, Double rating, String additionalInfo, String poster) {
         this.title = title;
         this.rating = rating;
         this.additionalInfo = additionalInfo;
+        this.poster = poster;
+    }
+
+    public String getPoster() {
+        return poster;
     }
 
     public String getTitle() {
@@ -36,5 +42,6 @@ public class ItemUpdateRequest {
         item.setTitle(title);
         item.setRating(rating);
         item.setAdditionalInfo(additionalInfo);
+        item.setPoster(poster);
     }
 }

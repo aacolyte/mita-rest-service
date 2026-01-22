@@ -12,6 +12,9 @@ public class Item {
     @Column
     private Long id;
 
+    @Column
+    private String poster;
+
     @Column(nullable = false, unique = true)
     private String title;
 
@@ -27,11 +30,12 @@ public class Item {
 
     public Item() {}
 
-    public Item(String title, Double rating, String additionalInfo, Category category) {
+    public Item(String title, Double rating, String additionalInfo, Category category, String poster) {
         this.category = category;
         this.title = title;
         this.rating = rating;
         this.additionalInfo = additionalInfo;
+        this.poster = poster;
     }
 
     public void setId(Long id) {
@@ -40,6 +44,14 @@ public class Item {
 
     public Long getId() {
         return id;
+    }
+
+    public String getPoster() {
+        return poster;
+    }
+
+    public void setPoster(String poster) {
+        this.poster = poster;
     }
 
     public Category getCategory() {
@@ -79,7 +91,8 @@ public class Item {
                 title,
                 rating,
                 additionalInfo,
-                category.getId()
+                category.getId(),
+                poster
         );
     }
 

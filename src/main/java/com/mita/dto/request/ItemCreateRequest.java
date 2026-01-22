@@ -17,11 +17,20 @@ public class ItemCreateRequest {
     @NotNull
     private Long categoryId;
 
-    public ItemCreateRequest(String title, Double rating, String additionalInfo, Long categoryId) {
+    private String poster;
+
+    public ItemCreateRequest() {}
+
+    public ItemCreateRequest(String title, Double rating, String additionalInfo, Long categoryId, String poster) {
         this.title = title;
         this.rating = rating;
         this.additionalInfo = additionalInfo;
         this.categoryId = categoryId;
+        this.poster = poster;
+    }
+
+    public String getPoster() {
+        return poster;
     }
 
     public String getTitle() {
@@ -45,7 +54,8 @@ public class ItemCreateRequest {
                 this.getTitle(),
                 this.getRating(),
                 this.getAdditionalInfo(),
-                category
+                category,
+                this.poster
         );
     }
 }
