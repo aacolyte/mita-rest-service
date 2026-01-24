@@ -92,7 +92,7 @@ public class Item {
                 rating,
                 additionalInfo,
                 category.getId(),
-                poster
+                poster != null ? "/posters/" + poster : null
         );
     }
 

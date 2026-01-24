@@ -9,6 +9,8 @@ import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/items")
 public class ItemController {
@@ -67,6 +69,13 @@ public class ItemController {
     }
 
 
+    @PostMapping("/poster/delete")
+    public void deletePoster(@RequestBody Map<String, String> body){
+        String poster = body.get("poster");
+        if(poster != null){
+            itemService.deletePosterIfExists(poster);
+        }
+    }
 
 
 

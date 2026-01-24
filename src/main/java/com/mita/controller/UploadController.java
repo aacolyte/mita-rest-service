@@ -23,10 +23,14 @@ public class UploadController {
             throw new RuntimeException("File is empty");
         }
         String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-        Path path = Paths.get("posters/" +  fileName);
+        Path path = Paths.get("posters/").resolve(fileName);
 
         Files.createDirectories(path.getParent());
         Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-        return "/posters/" +  fileName;
+        return fileName;
     }
+
+
+
+
 }

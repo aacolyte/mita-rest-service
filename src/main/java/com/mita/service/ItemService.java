@@ -18,6 +18,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Service
@@ -104,11 +108,24 @@ public class ItemService {
     }
 
     public void deleteItemById(Long id) {
-        if (!itemRepository.existsById(id)) {
-            throw new IllegalArgumentException("Item with id: " + id + " not found");
-        }
+        Item item = itemRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Item with id: " + id + " not found"));
 
+        deletePosterIfExists(item.getPoster());
         itemRepository.deleteById(id);
+    }
+
+    public void deletePosterIfExists(String poster){
+        if(poster == null || poster.isBlank()) return;
+        try{
+            Path filePath = Paths.get("posters").toAbsolutePath().resolve(poster).normalize();
+            if(!filePath.startsWith(filePath)){
+                return;
+            }
+            Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            System.err.println("Failed to delete poster: " + poster);
+        }
     }
 
 
