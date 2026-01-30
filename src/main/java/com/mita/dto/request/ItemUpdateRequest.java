@@ -9,8 +9,8 @@ public class ItemUpdateRequest {
     private final String title;
 
     @NotNull
-    @DecimalMin(value = "0.0", inclusive = true)
-    @DecimalMax(value = "10.0", inclusive = true)
+    @DecimalMin(value = "0.0", inclusive = true,  message = "Rating must be between 0 and 10")
+    @DecimalMax(value = "10.0", inclusive = true,  message = "Rating must be between 0 and 10")
     private final Double rating;
     private final String additionalInfo;
     private final String poster;

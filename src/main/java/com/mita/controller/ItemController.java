@@ -58,7 +58,7 @@ public class ItemController {
 
 
     @PutMapping("/{id}")
-    public ItemDto updateItem(@Valid @PathVariable Long id, @RequestBody ItemUpdateRequest request) {
+    public ItemDto updateItem(@PathVariable Long id, @Valid @RequestBody ItemUpdateRequest request) {
         return itemService.updateItem(id,request);
     }
 

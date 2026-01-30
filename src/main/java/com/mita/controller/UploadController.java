@@ -22,6 +22,10 @@ public class UploadController {
         if(file.isEmpty()){
             throw new RuntimeException("File is empty");
         }
+        if (!file.getContentType().startsWith("image/")) {
+            throw new RuntimeException("Only image files are allowed");
+        }
+
         String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
         Path path = Paths.get("posters/").resolve(fileName);
 
