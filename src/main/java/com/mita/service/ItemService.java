@@ -12,6 +12,7 @@ import com.mita.repository.ItemRepository;
 import com.mita.specification.ItemSpecification;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -47,6 +48,8 @@ public class ItemService {
             Double ratingAbove,
             String additionalInfo,
             Integer limit,
+            Integer page,
+            Integer size,
             String sort
     ) {
         Sort sorting = parseSort(sort);
@@ -58,19 +61,21 @@ public class ItemService {
                 ratingAbove,
                 additionalInfo
         );
-        List<ItemDto> items;
 
-        int safeLimit = (limit == null || limit <= 0)
-            ? 50
-            : Math.min(limit, 50);
 
-            Pageable pageable = PageRequest.of(0, safeLimit, sorting);
-            items = itemRepository.findAll(spec, pageable)
+        int safePage =  (page == null || page < 0) ? 0 : page;
+        int safeSize = (size == null || size <= 0) ? 12 : Math.min(size,12);
+
+        Pageable pageable = PageRequest.of(safePage, safeSize, sorting);
+
+        Page<Item> pageResult = itemRepository.findAll(spec, pageable);
+
+        List<ItemDto> items = pageResult.getContent()
                     .stream().map(Item::toDto)
                     .toList();
 
 
-        return new ItemContainerDto(items);
+        return new ItemContainerDto(items, pageResult.getTotalPages(), pageResult.getTotalElements());
     }
 
     private Sort parseSort(String sort) {

@@ -1,6 +1,8 @@
 package com.mita.repository;
 
 import com.mita.entity.Item;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,6 +16,6 @@ public interface ItemRepository extends JpaRepository<Item, Long>, JpaSpecificat
 
     List<Item> findByCategoryId(Long categoryId, Sort sort);
 
-    List<Item> findAll(Specification<Item> spec, Sort sort);
+    Page<Item> findAll(Specification<Item> spec, Pageable pageable);
 
 }

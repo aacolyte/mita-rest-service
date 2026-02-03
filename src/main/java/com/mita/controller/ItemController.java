@@ -30,6 +30,8 @@ public class ItemController {
             @RequestParam(required = false) Double rating,
             @RequestParam(required = false) Double ratingAbove,
             @RequestParam(required = false) String additionalInfo,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size,
             @RequestParam(required = false) Integer limit,
 
             @RequestParam(required = false, defaultValue = "rating,desc") String sort
@@ -41,6 +43,8 @@ public class ItemController {
                 ratingAbove,
                 additionalInfo,
                 limit,
+                page,
+                size,
                 sort
         );
     }
