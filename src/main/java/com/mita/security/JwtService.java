@@ -58,23 +58,23 @@ public class JwtService {
     }
 
 
-    public String generateToken(UserDetails user) {
-        Date now = new Date();
-        Date date = Date.from(LocalDateTime.now().plusMinutes(1).atZone(ZoneId.systemDefault()).toInstant());
+    public String generateAccessToken(UserDetails user) {
+        Date date = Date.from(LocalDateTime.now().plusMinutes(15).atZone(ZoneId.systemDefault()).toInstant());
         return Jwts.builder()
                 .setSubject(user.getUsername())
-                .setIssuedAt(now)
+                .setIssuedAt(new Date())
                 .setExpiration(date)
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    private String generateRefreshToken(String email) {
-        Date date = Date.from(LocalDateTime.now().plusDays(1).atZone(ZoneId.systemDefault()).toInstant());
+    public String generateRefreshToken(UserDetails user) {
+        Date date = Date.from(LocalDateTime.now().plusDays(30).atZone(ZoneId.systemDefault()).toInstant());
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(user.getUsername())
+                .setIssuedAt(new Date())
                 .setExpiration(date)
-                .signWith(getSignKey())
+                .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
