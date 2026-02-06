@@ -17,18 +17,17 @@ public class RefreshToken {
     @ManyToOne
     private User user;
 
-    private boolean revoked;
-
+    @Column(nullable = false)
     private Date expiryDate;
 
     public RefreshToken() {
     }
 
-    public RefreshToken(Long id, String token, User user, boolean revoked, Date expiryDate) {
+    public RefreshToken(Long id, String token, User user, Date expiryDate) {
         Id = id;
         this.token = token;
         this.user = user;
-        this.revoked = revoked;
+
         this.expiryDate = expiryDate;
     }
 
@@ -54,14 +53,6 @@ public class RefreshToken {
 
     public void setUser(User user) {
         this.user = user;
-    }
-
-    public boolean isRevoked() {
-        return revoked;
-    }
-
-    public void setRevoked(boolean revoked) {
-        this.revoked = revoked;
     }
 
     public Date getExpiryDate() {

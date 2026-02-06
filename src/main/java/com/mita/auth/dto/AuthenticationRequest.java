@@ -1,4 +1,4 @@
-package com.mita.auth;
+package com.mita.auth.dto;
 
 public class AuthenticationRequest {
 

@@ -49,7 +49,7 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
-    private Claims extractAllClaims(String token) {
+    public Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSignKey())
                 .build()
@@ -59,9 +59,10 @@ public class JwtService {
 
 
     public String generateAccessToken(UserDetails user) {
-        Date date = Date.from(LocalDateTime.now().plusMinutes(15).atZone(ZoneId.systemDefault()).toInstant());
+        Date date = Date.from(LocalDateTime.now().plusMinutes(1).atZone(ZoneId.systemDefault()).toInstant());
         return Jwts.builder()
                 .setSubject(user.getUsername())
+                .claim("type","access")
                 .setIssuedAt(new Date())
                 .setExpiration(date)
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
@@ -69,9 +70,10 @@ public class JwtService {
     }
 
     public String generateRefreshToken(UserDetails user) {
-        Date date = Date.from(LocalDateTime.now().plusDays(30).atZone(ZoneId.systemDefault()).toInstant());
+        Date date = Date.from(LocalDateTime.now().plusMinutes(3).atZone(ZoneId.systemDefault()).toInstant());
         return Jwts.builder()
                 .setSubject(user.getUsername())
+                .claim("type","refresh")
                 .setIssuedAt(new Date())
                 .setExpiration(date)
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)

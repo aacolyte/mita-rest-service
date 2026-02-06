@@ -1,5 +1,8 @@
-package com.mita.auth;
+package com.mita.auth.service;
 
+import com.mita.auth.dto.AuthenticationRequest;
+import com.mita.auth.dto.AuthenticationResponse;
+import com.mita.auth.dto.RegisterRequest;
 import com.mita.entity.RefreshToken;
 import com.mita.entity.Role;
 import com.mita.entity.User;
@@ -66,7 +69,6 @@ public class AuthenticationService {
         RefreshToken refreshTokenEntity = new RefreshToken();
         refreshTokenEntity.setToken(refreshToken);
         refreshTokenEntity.setUser(user);
-        refreshTokenEntity.setRevoked(false);
         refreshTokenEntity.setExpiryDate(
                 Date.from(LocalDateTime.now()
                         .plusDays(7)
@@ -80,23 +82,17 @@ public class AuthenticationService {
 
     public AuthenticationResponse refresh(String refreshToken) {
 
-        RefreshToken stored = refresherTokenRepository.findByToken(refreshToken).orElseThrow();
-
-        if(stored.isRevoked()){
-            throw new RuntimeException("Token is revoked");
-        }
-        if(stored.getExpiryDate().before(new Date())){
-            throw new RuntimeException("Token is expired");
-        }
-
-        User user = stored.getUser();
-
-        stored.setRevoked(true);
-        refresherTokenRepository.save(stored);
-
-        return buildTokens(user);
-
+        return refresherTokenRepository.findByToken(refreshToken)
+                .map(token -> {
+                    refresherTokenRepository.delete(token);
+                    User user = token.getUser();
+                    return buildTokens(user);
+                })
+                .orElseThrow(() -> new RuntimeException("Refresh token not found"));
     }
 
 
+    public void deleteRefreshToken(String refreshToken) {
+        refresherTokenRepository.findByToken(refreshToken).ifPresent(refresherTokenRepository::delete);
+    }
 }
