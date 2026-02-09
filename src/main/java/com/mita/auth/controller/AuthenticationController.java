@@ -19,10 +19,8 @@ public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
     private final RefresherTokenRepository refresherTokenRepository;
-    private AuthenticationService service;
 
     public AuthenticationController(AuthenticationService service, AuthenticationService authenticationService, RefresherTokenRepository refresherTokenRepository) {
-        this.service = service;
         this.authenticationService = authenticationService;
         this.refresherTokenRepository = refresherTokenRepository;
     }
@@ -31,14 +29,14 @@ public class AuthenticationController {
     public ResponseEntity<AuthenticationResponse> register(
             @RequestBody RegisterRequest request
     ) {
-        return ResponseEntity.ok(service.register(request));
+        return ResponseEntity.ok(authenticationService.register(request));
     }
 
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse>  authenticate(
             @RequestBody AuthenticationRequest request
     ) {
-        return ResponseEntity.ok(service.authenticate(request));
+        return ResponseEntity.ok(authenticationService.authenticate(request));
     }
 
     @PostMapping("/refresh")
@@ -47,7 +45,7 @@ public class AuthenticationController {
     ){
         String refreshToken = request.get("refreshToken");
 
-        return ResponseEntity.ok(service.refresh(refreshToken));
+        return ResponseEntity.ok(authenticationService.refresh(refreshToken));
     }
 
     @PostMapping("/logout")

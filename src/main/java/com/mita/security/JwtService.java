@@ -70,7 +70,7 @@ public class JwtService {
     }
 
     public String generateRefreshToken(UserDetails user) {
-        Date date = Date.from(LocalDateTime.now().plusMinutes(3).atZone(ZoneId.systemDefault()).toInstant());
+        Date date = Date.from(LocalDateTime.now().plusDays(30).atZone(ZoneId.systemDefault()).toInstant());
         return Jwts.builder()
                 .setSubject(user.getUsername())
                 .claim("type","refresh")
