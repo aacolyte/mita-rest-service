@@ -5,6 +5,7 @@ import com.mita.dto.CategoryDto;
 import com.mita.dto.request.CategoryCreateRequest;
 import com.mita.dto.request.CategoryUpdateRequest;
 import com.mita.entity.Category;
+import com.mita.entity.User;
 import com.mita.repository.CategoryRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,33 +17,40 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class CategoryService {
+    private final UserService userService;
     private CategoryRepository categoryRepository;
 
     @Autowired
-    public CategoryService(CategoryRepository categoryRepository) {
+    public CategoryService(CategoryRepository categoryRepository, UserService userService) {
         this.categoryRepository = categoryRepository;
+        this.userService = userService;
     }
 
     public CategoryContainerDto getAllCategories() {
-        List<CategoryDto> categoryList = categoryRepository.findAll().stream()
+        User user = userService.getCurrentUser();
+        List<CategoryDto> categoryList = categoryRepository.findByUser(user).stream()
                 .map(Category::toDto)
                 .collect(Collectors.toList());
         return new CategoryContainerDto(categoryList);
     }
 
     public CategoryDto getCategoryById(Long id) {
-        return categoryRepository.findById(id)
+        User user = userService.getCurrentUser();
+        return categoryRepository.findByIdAndUser(id,user)
                 .map(Category::toDto)
                 .orElseThrow(()-> new IllegalArgumentException("Category with id: "+ id +" not found"));
     }
 
     public CategoryDto createCategory(CategoryCreateRequest request) {
         Category category = request.toEntity();
+        User currentUser = userService.getCurrentUser();
+        category.setUser(currentUser);
         return categoryRepository.save(category).toDto();
     }
 
     public CategoryDto updateCategory(Long id, CategoryUpdateRequest request) {
-        Category category = categoryRepository.findById(id).orElseThrow(
+        User user = userService.getCurrentUser();
+        Category category = categoryRepository.findByIdAndUser(id,user).orElseThrow(
                 ()-> new IllegalArgumentException("Category with id: "+ id +" not found"));
         request.applyTo(category);
         return category.toDto();
@@ -50,11 +58,12 @@ public class CategoryService {
     }
 
     public void deleteCategoryById(Long id) {
-        if (!categoryRepository.existsById(id)) {
-            throw new IllegalArgumentException("Category with id: " + id + " not found");
-        }
+        User user = userService.getCurrentUser();
 
-        categoryRepository.deleteById(id);
+        Category category = categoryRepository.findByIdAndUser(id,user).orElseThrow(()->
+            new IllegalArgumentException("Category with id: " + id + " not found"));
+
+        categoryRepository.delete(category);
     }
 
 

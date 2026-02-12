@@ -28,6 +28,10 @@ public class Item {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
     public Item() {}
 
     public Item(String title, Double rating, String additionalInfo, Category category, String poster) {
@@ -84,6 +88,14 @@ public class Item {
 
     public void setAdditionalInfo(String additionalInfo) {
         this.additionalInfo = additionalInfo;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public ItemDto toDto() {

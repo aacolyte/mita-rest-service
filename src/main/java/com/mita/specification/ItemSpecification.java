@@ -11,6 +11,7 @@ import java.util.List;
 public class ItemSpecification {
     public static Specification<Item> withFilters(
             Long categoryId,
+            Long userId,
             String title,
             Double rating,
             Double ratingAbove,
@@ -20,6 +21,9 @@ public class ItemSpecification {
                  List<Predicate> predicates = new ArrayList<>();
 
                  predicates.add(cb.equal(root.get("category").get("id"),categoryId));
+
+                 predicates.add(cb.equal(root.get("user").get("id"),userId));
+
 
                  if(title != null){
                      predicates.add(

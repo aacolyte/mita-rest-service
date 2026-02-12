@@ -77,7 +77,7 @@ public class ItemController {
     public void deletePoster(@RequestBody Map<String, String> body){
         String poster = body.get("poster");
         if(poster != null){
-            itemService.deletePosterIfExists(poster);
+            itemService.deletePoster(poster);
         }
     }
 
