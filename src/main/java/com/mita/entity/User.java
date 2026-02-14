@@ -23,6 +23,9 @@ public class User implements UserDetails {
     @Column
     private String avatar;
 
+    @Column
+    private String about;
+
     @Column(unique = true, nullable = false)
     private String email;
 
@@ -31,6 +34,7 @@ public class User implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
 
     public User() {}
 
@@ -119,5 +123,13 @@ public class User implements UserDetails {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public String getAbout() {
+        return about;
+    }
+
+    public void setAbout(String about) {
+        this.about = about;
     }
 }

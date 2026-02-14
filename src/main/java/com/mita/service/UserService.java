@@ -37,7 +37,8 @@ public class UserService {
         return new UserDto(
                 user.getEmail(),
                 user.getUsernameField(),
-                user.getAvatar()
+                user.getAvatar(),
+                user.getAbout()
         );
     }
 
@@ -50,7 +51,21 @@ public class UserService {
         return new UserDto(
                 currentUser.getEmail(),
                 currentUser.getUsernameField(),
-                currentUser.getAvatar()
+                currentUser.getAvatar(),
+                currentUser.getAbout()
+        );
+    }
+
+    public UserDto updateAbout(@RequestBody Map<String,String> body){
+        User currentUser = getCurrentUser();
+        String about = body.get("about");
+        currentUser.setAbout(about);
+        userRepository.save(currentUser);
+        return new UserDto(
+                currentUser.getEmail(),
+                currentUser.getUsernameField(),
+                currentUser.getAvatar(),
+                currentUser.getAbout()
         );
     }
 
