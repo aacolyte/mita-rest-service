@@ -4,9 +4,9 @@ import com.mita.dto.UserDto;
 import com.mita.repository.UserRepository;
 import com.mita.service.UserService;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -25,6 +25,10 @@ public class UserController {
         return userService.getProfile(authentication);
     }
 
+    @PutMapping("/avatar")
+    public UserDto updateAvatar(@RequestBody Map<String,String> body){
+        return userService.updateAvatar(body);
+    }
 
 
 }

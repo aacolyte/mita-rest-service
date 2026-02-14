@@ -20,6 +20,9 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String username;
 
+    @Column
+    private String avatar;
+
     @Column(unique = true, nullable = false)
     private String email;
 
@@ -108,5 +111,13 @@ public class User implements UserDetails {
 
     public Long getId() {
         return id;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 }

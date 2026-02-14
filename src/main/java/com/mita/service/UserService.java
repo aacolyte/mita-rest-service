@@ -7,6 +7,9 @@ import jakarta.transaction.Transactional;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.Map;
 
 @Service
 @Transactional
@@ -33,7 +36,23 @@ public class UserService {
 
         return new UserDto(
                 user.getEmail(),
-                user.getUsernameField()
+                user.getUsernameField(),
+                user.getAvatar()
         );
     }
+
+
+    public UserDto updateAvatar(@RequestBody Map<String,String> body){
+        User currentUser = getCurrentUser();
+        String avatar = body.get("avatar");
+        currentUser.setAvatar(avatar);
+        userRepository.save(currentUser);
+        return new UserDto(
+                currentUser.getEmail(),
+                currentUser.getUsernameField(),
+                currentUser.getAvatar()
+        );
+    }
+
+
 }
