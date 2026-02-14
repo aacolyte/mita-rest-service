@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,5 +22,18 @@ public interface ItemRepository extends JpaRepository<Item, Long>, JpaSpecificat
     Page<Item> findAll(Specification<Item> spec, Pageable pageable);
 
     Optional<Item> findByIdAndUser(Long id, User user);
+
+
+    @Query("""
+       SELECT i FROM Item i
+       WHERE i.user.id = :userId
+       AND i.rating = (
+           SELECT MAX(i2.rating)
+           FROM Item i2
+           WHERE i2.category.id = i.category.id
+           AND i2.user.id = :userId
+           ) 
+    """)
+    List<Item> findTopItemsPerCategory(Long userId);
 
 }

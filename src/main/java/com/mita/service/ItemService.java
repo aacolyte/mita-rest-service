@@ -5,6 +5,7 @@ import com.mita.dto.ItemContainerDto;
 import com.mita.dto.ItemDto;
 import com.mita.dto.request.ItemCreateRequest;
 import com.mita.dto.request.ItemUpdateRequest;
+import com.mita.dto.request.TopItemsPerCategoryResponse;
 import com.mita.entity.Category;
 import com.mita.entity.Item;
 import com.mita.entity.User;
@@ -166,6 +167,19 @@ public class ItemService {
 
 
 
+    public List<TopItemsPerCategoryResponse> getTopItemsPerCategory() {
+        User user = userService.getCurrentUser();
+
+        List<Item> topItems =
+                itemRepository.findTopItemsPerCategory(user.getId());
+
+        return topItems.stream()
+                .map(item -> new TopItemsPerCategoryResponse(
+                        item.getCategory().getId(),
+                        item.getCategory().getName(),
+                        item.toDto()
+                )).toList();
+    }
 
 
 

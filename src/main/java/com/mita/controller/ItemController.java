@@ -4,11 +4,12 @@ import com.mita.dto.ItemContainerDto;
 import com.mita.dto.ItemDto;
 import com.mita.dto.request.ItemCreateRequest;
 import com.mita.dto.request.ItemUpdateRequest;
+import com.mita.dto.request.TopItemsPerCategoryResponse;
 import com.mita.service.ItemService;
 import jakarta.validation.Valid;
-
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -79,6 +80,11 @@ public class ItemController {
         if(poster != null){
             itemService.deletePoster(poster);
         }
+    }
+
+    @GetMapping("/top-items")
+    public List<TopItemsPerCategoryResponse> topItemsPerCategory(){
+        return itemService.getTopItemsPerCategory();
     }
 
 
