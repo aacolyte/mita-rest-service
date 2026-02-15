@@ -1,7 +1,10 @@
 package com.mita.service;
 
 import com.mita.dto.UserDto;
+import com.mita.dto.request.UserStatsDto;
 import com.mita.entity.User;
+import com.mita.repository.CategoryRepository;
+import com.mita.repository.ItemRepository;
 import com.mita.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.Authentication;
@@ -15,10 +18,14 @@ import java.util.Map;
 @Transactional
 public class UserService {
 
+    private final ItemRepository itemRepository;
+    private final CategoryRepository categoryRepository;
     private UserRepository userRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, ItemRepository itemRepository, CategoryRepository categoryRepository) {
         this.userRepository = userRepository;
+        this.itemRepository = itemRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     public User getCurrentUser(){
@@ -79,6 +86,18 @@ public class UserService {
                 currentUser.getUsernameField(),
                 currentUser.getAvatar(),
                 currentUser.getAbout()
+        );
+    }
+
+
+    public UserStatsDto getUserStats() {
+        User currentUser = getCurrentUser();
+        int totalItems = itemRepository.countByUserId(currentUser.getId());
+        int totalCategories = categoryRepository.countByUserId(currentUser.getId());
+
+        return new UserStatsDto(
+                totalItems,
+                totalCategories
         );
     }
 

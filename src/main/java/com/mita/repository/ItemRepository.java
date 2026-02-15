@@ -36,4 +36,6 @@ public interface ItemRepository extends JpaRepository<Item, Long>, JpaSpecificat
     """)
     List<Item> findTopItemsPerCategory(Long userId);
 
+    int countByUserId(Long userId);
+
 }

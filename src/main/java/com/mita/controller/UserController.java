@@ -1,6 +1,7 @@
 package com.mita.controller;
 
 import com.mita.dto.UserDto;
+import com.mita.dto.request.UserStatsDto;
 import com.mita.repository.UserRepository;
 import com.mita.service.UserService;
 import org.springframework.security.core.Authentication;
@@ -39,6 +40,11 @@ public class UserController {
     @PutMapping("/name")
     public UserDto updateName(@RequestBody Map<String,String> body){
         return userService.updateName(body);
+    }
+
+    @GetMapping("/stats")
+    public UserStatsDto getUserStats(){
+        return userService.getUserStats();
     }
 
 }
