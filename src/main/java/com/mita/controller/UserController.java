@@ -36,4 +36,9 @@ public class UserController {
         return userService.updateAbout(body);
     }
 
+    @PutMapping("/name")
+    public UserDto updateName(@RequestBody Map<String,String> body){
+        return userService.updateName(body);
+    }
+
 }

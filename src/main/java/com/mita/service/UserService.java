@@ -69,5 +69,19 @@ public class UserService {
         );
     }
 
+    public UserDto updateName(@RequestBody Map<String,String> body){
+        User currentUser = getCurrentUser();
+        String name = body.get("name");
+        currentUser.setUsername(name);
+        userRepository.save(currentUser);
+        return new UserDto(
+                currentUser.getEmail(),
+                currentUser.getUsernameField(),
+                currentUser.getAvatar(),
+                currentUser.getAbout()
+        );
+    }
+
+
 
 }
