@@ -10,7 +10,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Map;
 
@@ -50,7 +49,7 @@ public class UserService {
     }
 
 
-    public UserDto updateAvatar(@RequestBody Map<String,String> body){
+    public UserDto updateAvatar(Map<String,String> body){
         User currentUser = getCurrentUser();
         String avatar = body.get("avatar");
         currentUser.setAvatar(avatar);
@@ -63,7 +62,7 @@ public class UserService {
         );
     }
 
-    public UserDto updateAbout(@RequestBody Map<String,String> body){
+    public UserDto updateAbout(Map<String,String> body){
         User currentUser = getCurrentUser();
         String about = body.get("about");
         currentUser.setAbout(about);
@@ -76,7 +75,7 @@ public class UserService {
         );
     }
 
-    public UserDto updateName(@RequestBody Map<String,String> body){
+    public UserDto updateName(Map<String,String> body){
         User currentUser = getCurrentUser();
         String name = body.get("name");
         currentUser.setUsername(name);
@@ -99,6 +98,25 @@ public class UserService {
                 totalItems,
                 totalCategories
         );
+    }
+
+    public UserDto getUserByEmail(Map<String,String> body) {
+        String email = body.get("email");
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User with email " + email + " not found"));
+
+        return new UserDto(
+                user.getEmail(),
+                user.getUsernameField(),
+                user.getAvatar(),
+                user.getAbout()
+        );
+    }
+
+    public void deleteUserByEmail(Map<String, String> body) {
+        String email = body.get("email");
+        userRepository.deleteByEmail(email);
     }
 
 
