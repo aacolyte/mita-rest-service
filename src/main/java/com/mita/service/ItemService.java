@@ -19,13 +19,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 @Service
@@ -36,13 +31,15 @@ public class ItemService {
     private final CategoryService categoryService;
     private final UserService userService;
     private ItemRepository itemRepository;
+    private final UploadService uploadService;
 
     @Autowired
-    public ItemService(ItemRepository itemRepository, CategoryRepository categoryRepository, CategoryService categoryService, UserService userService) {
+    public ItemService(ItemRepository itemRepository, CategoryRepository categoryRepository, CategoryService categoryService, UserService userService, UploadService uploadService) {
         this.itemRepository = itemRepository;
         this.categoryRepository = categoryRepository;
         this.categoryService = categoryService;
         this.userService = userService;
+        this.uploadService = uploadService;
     }
 
 
@@ -129,41 +126,10 @@ public class ItemService {
         Item item = itemRepository.findByIdAndUser(id,user)
                 .orElseThrow(() -> new IllegalArgumentException("Item with id: " + id + " not found"));
 
-        deletePosterIfExists(item.getPoster());
+        uploadService.deletePosterIfExists(item.getPoster());
         itemRepository.deleteById(id);
     }
 
-    public void deletePosterIfExists(String poster){
-
-        if(poster == null || poster.isBlank()) return;
-        try{
-            Path filePath = Paths.get("posters").toAbsolutePath().resolve(poster).normalize();
-            if(!filePath.startsWith(filePath)){
-                return;
-            }
-            Files.deleteIfExists(filePath);
-        } catch (IOException e) {
-            System.err.println("Failed to delete poster: " + poster);
-        }
-    }
-
-
-    public void deletePoster(String poster) {
-        User user = userService.getCurrentUser();
-
-        boolean ownsPoster =
-                itemRepository.exists(
-                        (root,q,cb) ->
-                                cb.and(
-                                        cb.equal(root.get("poster"), poster),
-                                        cb.equal(root.get("user"), user)
-                                )
-                );
-        if(!ownsPoster){
-            throw new AccessDeniedException("Not your poster");
-        }
-        deletePosterIfExists(poster);
-    }
 
 
 

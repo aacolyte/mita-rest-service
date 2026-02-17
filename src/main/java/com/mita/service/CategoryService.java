@@ -7,8 +7,11 @@ import com.mita.dto.request.CategoryUpdateRequest;
 import com.mita.entity.Category;
 import com.mita.entity.User;
 import com.mita.repository.CategoryRepository;
+import com.mita.repository.ItemRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,12 +21,16 @@ import java.util.stream.Collectors;
 @Transactional
 public class CategoryService {
     private final UserService userService;
+    private final ItemRepository itemRepository;
+    private final UploadService uploadService;
     private CategoryRepository categoryRepository;
 
     @Autowired
-    public CategoryService(CategoryRepository categoryRepository, UserService userService) {
+    public CategoryService(CategoryRepository categoryRepository, UserService userService, ItemRepository itemRepository, UploadService uploadService) {
         this.categoryRepository = categoryRepository;
         this.userService = userService;
+        this.itemRepository = itemRepository;
+        this.uploadService = uploadService;
     }
 
     public CategoryContainerDto getAllCategories() {
@@ -62,6 +69,21 @@ public class CategoryService {
 
         Category category = categoryRepository.findByIdAndUser(id,user).orElseThrow(()->
             new IllegalArgumentException("Category with id: " + id + " not found"));
+
+        int page = 0;
+        Page<String> posterPage;
+
+        do {
+            posterPage = itemRepository.findPosterNameByCategoryId(
+                    id,
+                    PageRequest.of(page, 100)
+            );
+            for (String poster : posterPage.getContent()) {
+                uploadService.deletePoster(poster);
+            }
+            page++;
+
+        }while(!posterPage.isLast());
 
         categoryRepository.delete(category);
     }

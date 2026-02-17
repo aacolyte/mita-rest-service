@@ -6,6 +6,7 @@ import com.mita.dto.request.ItemCreateRequest;
 import com.mita.dto.request.ItemUpdateRequest;
 import com.mita.dto.request.TopItemsPerCategoryResponse;
 import com.mita.service.ItemService;
+import com.mita.service.UploadService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,10 +17,12 @@ import java.util.Map;
 @RequestMapping("/api/items")
 public class ItemController {
 
+    private final UploadService uploadService;
     private ItemService itemService;
 
-    public ItemController(ItemService itemService) {
+    public ItemController(ItemService itemService, UploadService uploadService) {
         this.itemService = itemService;
+        this.uploadService = uploadService;
     }
 
 
@@ -78,7 +81,7 @@ public class ItemController {
     public void deletePoster(@RequestBody Map<String, String> body){
         String poster = body.get("poster");
         if(poster != null){
-            itemService.deletePoster(poster);
+            uploadService.deletePoster(poster);
         }
     }
 
