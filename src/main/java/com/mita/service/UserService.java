@@ -19,12 +19,14 @@ public class UserService {
 
     private final ItemRepository itemRepository;
     private final CategoryRepository categoryRepository;
+    private final UploadService uploadService;
     private UserRepository userRepository;
 
-    public UserService(UserRepository userRepository, ItemRepository itemRepository, CategoryRepository categoryRepository) {
+    public UserService(UserRepository userRepository, ItemRepository itemRepository, CategoryRepository categoryRepository, UploadService uploadService) {
         this.userRepository = userRepository;
         this.itemRepository = itemRepository;
         this.categoryRepository = categoryRepository;
+        this.uploadService = uploadService;
     }
 
     public User getCurrentUser(){
@@ -51,9 +53,17 @@ public class UserService {
 
     public UserDto updateAvatar(Map<String,String> body){
         User currentUser = getCurrentUser();
+
+        String oldAvatar = currentUser.getAvatar();
+
         String avatar = body.get("avatar");
         currentUser.setAvatar(avatar);
         userRepository.save(currentUser);
+
+        if(oldAvatar != null && !oldAvatar.equals(avatar)){
+            uploadService.deletePosterIfExists(oldAvatar);
+        }
+
         return new UserDto(
                 currentUser.getEmail(),
                 currentUser.getUsernameField(),

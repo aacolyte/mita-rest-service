@@ -19,10 +19,8 @@ import java.util.UUID;
 public class UploadService {
 
     private final ItemRepository itemRepository;
-    UserService userService;
 
-    public UploadService(UserService userService, ItemRepository itemRepository) {
-        this.userService = userService;
+    public UploadService(ItemRepository itemRepository) {
         this.itemRepository = itemRepository;
     }
 
