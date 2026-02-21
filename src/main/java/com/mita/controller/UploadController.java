@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -33,6 +34,11 @@ public class UploadController {
                 .body(resource);
     }
 
+    @PostMapping("/posters/delete")
+    public void deletePoster(@RequestBody Map<String, String> body){
+        String poster = body.get("poster");
+        uploadService.deletePosterIfExists(poster);
+    }
 
 
 

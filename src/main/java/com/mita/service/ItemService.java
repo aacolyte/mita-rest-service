@@ -1,6 +1,7 @@
 package com.mita.service;
 
 
+import com.mita.ValidationException;
 import com.mita.dto.ItemContainerDto;
 import com.mita.dto.ItemDto;
 import com.mita.dto.request.ItemCreateRequest;
@@ -106,19 +107,47 @@ public class ItemService {
     public ItemDto createItem(ItemCreateRequest request) {
         User user = userService.getCurrentUser();
 
-        Category category = categoryRepository.findByIdAndUser(request.getCategoryId(),user).orElseThrow(
-                ()-> new IllegalArgumentException("Category with id: "+ request.getCategoryId() +" not found")
-        );
-        Item item = request.toEntity(category);
-        item.setUser(user);
-        return itemRepository.save(item).toDto();
+        try {
+            validateItemRequest(request.getRating());
+
+            Category category = categoryRepository.findByIdAndUser(request.getCategoryId(), user).orElseThrow(
+                    () -> new IllegalArgumentException("Category with id: " + request.getCategoryId() + " not found")
+            );
+            Item item = request.toEntity(category);
+            item.setUser(user);
+            return itemRepository.save(item).toDto();
+        }catch (ValidationException e) {
+            if(request.getPoster() != null) {
+                uploadService.deletePosterIfExists(request.getPoster());
+            }
+            throw e;
+        }
     }
 
     public ItemDto updateItem(Long id, ItemUpdateRequest request) {
         User user = userService.getCurrentUser();
         Item item = itemRepository.findByIdAndUser(id,user).orElseThrow(()-> new IllegalArgumentException("Item with id: "+ id +" not found"));
-        request.applyTo(item);
-        return item.toDto();
+
+        String oldPoster = item.getPoster();
+        try {
+            validateItemRequest(request.getRating());
+
+            request.applyTo(item);
+
+            if (oldPoster != null && !oldPoster.equals(item.getPoster())) {
+                uploadService.deletePosterIfExists(oldPoster);
+            }
+
+            return item.toDto();
+
+        }catch (ValidationException e) {
+            if(request.getPoster() != null &&
+            oldPoster != null &&
+            !oldPoster.equals(item.getPoster())) {
+                uploadService.deletePosterIfExists(request.getPoster());
+            }
+            throw e;
+        }
     }
 
     public void deleteItemById(Long id) {
@@ -145,6 +174,19 @@ public class ItemService {
                         item.getCategory().getName(),
                         item.toDto()
                 )).toList();
+    }
+
+
+
+    private void validateItemRequest(Double rating) {
+        if(rating == null ) {
+            throw new ValidationException("Rating must not be null");
+        }
+
+        if(rating < 0 || rating > 10){
+            throw new ValidationException("Rating must be between 0 and 10");
+        }
+
     }
 
 

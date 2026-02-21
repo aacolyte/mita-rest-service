@@ -79,7 +79,7 @@ public class CategoryService {
                     PageRequest.of(page, 100)
             );
             for (String poster : posterPage.getContent()) {
-                uploadService.deletePoster(poster);
+                uploadService.deletePosterIfExists(poster);
             }
             page++;
 

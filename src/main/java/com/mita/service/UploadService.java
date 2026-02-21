@@ -1,11 +1,9 @@
 package com.mita.service;
 
-import com.mita.entity.User;
 import com.mita.repository.ItemRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -71,21 +69,7 @@ public class UploadService {
     }
 
 
-    public void deletePoster(String poster) {
-        User user = userService.getCurrentUser();
-        boolean ownsPoster = itemRepository.exists(
-                (root, q, cb) ->
-                        cb.and(
-                                cb.equal(root.get("poster"), poster),
-                                cb.equal(root.get("user"), user)
-                        )
-        );
-        if(!ownsPoster){
-            throw new AccessDeniedException("Not your poster");
-        }
 
-        deletePosterIfExists(poster);
-    }
 
 
 }

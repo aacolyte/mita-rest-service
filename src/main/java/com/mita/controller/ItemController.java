@@ -7,11 +7,9 @@ import com.mita.dto.request.ItemUpdateRequest;
 import com.mita.dto.request.TopItemsPerCategoryResponse;
 import com.mita.service.ItemService;
 import com.mita.service.UploadService;
-import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/items")
@@ -60,13 +58,13 @@ public class ItemController {
 
 
     @PostMapping
-    public ItemDto createItem(@Valid @RequestBody ItemCreateRequest request) {
+    public ItemDto createItem(@RequestBody ItemCreateRequest request) {
         return itemService.createItem(request);
     }
 
 
     @PutMapping("/{id}")
-    public ItemDto updateItem(@PathVariable Long id, @Valid @RequestBody ItemUpdateRequest request) {
+    public ItemDto updateItem(@PathVariable Long id, @RequestBody ItemUpdateRequest request) {
         return itemService.updateItem(id,request);
     }
 
@@ -77,13 +75,6 @@ public class ItemController {
     }
 
 
-    @PostMapping("/poster/delete")
-    public void deletePoster(@RequestBody Map<String, String> body){
-        String poster = body.get("poster");
-        if(poster != null){
-            uploadService.deletePoster(poster);
-        }
-    }
 
     @GetMapping("/top-items")
     public List<TopItemsPerCategoryResponse> topItemsPerCategory(){
