@@ -15,7 +15,7 @@ public class Item {
     @Column
     private String poster;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String title;
 
     @Column(nullable = false)

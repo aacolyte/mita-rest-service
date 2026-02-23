@@ -9,10 +9,13 @@ import com.mita.entity.User;
 import com.mita.repository.RefresherTokenRepository;
 import com.mita.repository.UserRepository;
 import com.mita.security.JwtService;
+import jakarta.transaction.Transactional;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -80,15 +83,23 @@ public class AuthenticationService {
         return new AuthenticationResponse(accessToken,refreshToken);
     }
 
+    @Transactional
     public AuthenticationResponse refresh(String refreshToken) {
 
-        return refresherTokenRepository.findByToken(refreshToken)
-                .map(token -> {
-                    refresherTokenRepository.delete(token);
-                    User user = token.getUser();
-                    return buildTokens(user);
-                })
-                .orElseThrow(() -> new RuntimeException("Refresh token not found"));
+        int deleted = refresherTokenRepository.deleteByToken(refreshToken);
+
+        if (deleted == 0) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Invalid or expired refresh token"
+            );
+
+        }
+        String email = jwtService.getEmailFromToken(refreshToken);
+
+        User user = userRepository.findByEmail(email).orElseThrow();
+
+        return buildTokens(user);
     }
 
 

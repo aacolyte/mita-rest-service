@@ -7,7 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "categories")
+@Table(
+        name = "categories",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        columnNames = {"name", "user_id"}
+                )
+        }
+)
 public class Category {
 
     @Id
@@ -15,14 +22,14 @@ public class Category {
     @Column
     private Long id;
 
-    @Column(unique = true)
+    @Column
     private String name;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     private List<Item> items = new ArrayList<>();
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     public Long getId() {
