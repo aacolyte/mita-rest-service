@@ -25,16 +25,18 @@ public interface ItemRepository extends JpaRepository<Item, Long>, JpaSpecificat
     Optional<Item> findByIdAndUser(Long id, User user);
 
 
-    @Query("""
-       SELECT i FROM Item i
-       WHERE i.user.id = :userId
-       AND i.rating = (
-           SELECT MAX(i2.rating)
-           FROM Item i2
-           WHERE i2.category.id = i.category.id
-           AND i2.user.id = :userId
-           ) 
-    """)
+    @Query(value = """
+    SELECT * FROM (
+        SELECT i.*,
+               ROW_NUMBER() OVER (
+                   PARTITION BY category_id
+                   ORDER BY rating DESC
+               ) as rn
+        FROM items i
+        WHERE i.user_id = :userId
+    ) t
+    WHERE t.rn = 1
+""", nativeQuery = true)
     List<Item> findTopItemsPerCategory(Long userId);
 
     int countByUserId(Long userId);
