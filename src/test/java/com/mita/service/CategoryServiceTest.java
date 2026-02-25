@@ -60,6 +60,8 @@ public class CategoryServiceTest {
         savedCategory = new Category();
         savedCategory.setId(1L);
         savedCategory.setName("Anime");
+
+
     }
 
     @Test
@@ -74,6 +76,8 @@ public class CategoryServiceTest {
         assertNotNull(result);
         assertEquals(1L,result.getId());
         assertEquals("Anime",result.getName());
+
+        verify(userService, times(1)).getCurrentUser();
         verify(categoryRepository,times(1)).save(any(Category.class));
     }
 
@@ -86,6 +90,8 @@ public class CategoryServiceTest {
         assertNotNull(result);
         assertEquals(1L,result.getId());
         assertEquals("Anime",result.getName());
+
+        verify(userService, times(1)).getCurrentUser();
         verify(categoryRepository,times(1)).findByIdAndUser(1L,user);
     }
 
@@ -119,6 +125,8 @@ public class CategoryServiceTest {
         assertEquals(2, result.getAllCategories().size());
         assertEquals("Anime",result.getAllCategories().get(0).getName());
         assertEquals("Movie",result.getAllCategories().get(1).getName());
+
+        verify(userService, times(1)).getCurrentUser();
         verify(categoryRepository,times(1)).findByUser(user);
     }
     @Test
@@ -132,6 +140,8 @@ public class CategoryServiceTest {
         assertNotNull(result);
         assertEquals("New name",result.getName());
         assertEquals("New name",savedCategory.getName());
+
+        verify(userService, times(1)).getCurrentUser();
         verify(categoryRepository, times(1)).findByIdAndUser(1L,user);
         verify(categoryRepository, never()).save(any());
     }
@@ -142,6 +152,8 @@ public class CategoryServiceTest {
         when(itemRepository.findPosterNameByCategoryId(eq(1L), eq(PageRequest.of(0, 100)))).thenReturn(Page.empty());
 
         categoryService.deleteCategoryById(1L);
+
+        verify(userService, times(1)).getCurrentUser();
         verify(categoryRepository, times(1)).delete(savedCategory);
     }
 

@@ -88,6 +88,8 @@ public class ItemServiceTest {
         assertEquals("Some game",result.getTitle());
         assertEquals("true",result.getAdditionalInfo());
         assertEquals(10.0,result.getRating());
+
+        verify(userService, times(1)).getCurrentUser();
         verify(itemRepository, times(1)).save(any(Item.class));
     }
     @Test
@@ -101,6 +103,8 @@ public class ItemServiceTest {
         assertEquals("Some game",result.getTitle());
         assertEquals("true",result.getAdditionalInfo());
         assertEquals(10.0,result.getRating());
+
+        verify(userService, times(1)).getCurrentUser();
         verify(itemRepository, times(1)).findByIdAndUser(1L,user);
     }
     @Test
@@ -127,6 +131,8 @@ public class ItemServiceTest {
         assertEquals("New title",result.getTitle());
         assertEquals("false",result.getAdditionalInfo());
         assertEquals(7.5,result.getRating());
+
+        verify(userService, times(1)).getCurrentUser();
         verify(itemRepository, times(1)).findByIdAndUser(1L,user);
         verify(itemRepository, never()).save(any());
     }
@@ -134,6 +140,8 @@ public class ItemServiceTest {
     void shouldDeleteItem_whenItemExist() {
         when(itemRepository.findByIdAndUser(1L,user)).thenReturn(Optional.of(savedItem));
         itemService.deleteItemById(1L);
+
+        verify(userService, times(1)).getCurrentUser();
         verify(itemRepository,times(1)).deleteById(1L);
     }
 
@@ -142,12 +150,7 @@ public class ItemServiceTest {
 
     @Test
     void shouldReturnItemsFilteredByTitle() {
-        Item item2 = new Item();
-        item2.setId(2L);
-        item2.setTitle("Game 2");
-        item2.setRating(7.0);
-        item2.setAdditionalInfo("false");
-        item2.setCategory(savedCategory);
+        Item item2 = createItem(2L,"Game 2", 7.0, "false");
 
         when(itemRepository.findAll(any(Specification.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(savedItem, item2)));
@@ -159,16 +162,13 @@ public class ItemServiceTest {
         assertNotNull(result);
         assertEquals(2, result.getAllItems().size());
         assertTrue(result.getAllItems().get(0).getRating() >= result.getAllItems().get(1).getRating());
+
+        verify(userService, times(1)).getCurrentUser();
     }
 
     @Test
     void shouldReturnItemsFilteredByRatingAbove() {
-        Item item2 = new Item();
-        item2.setId(2L);
-        item2.setTitle("Game 2");
-        item2.setRating(10.0);
-        item2.setAdditionalInfo("false");
-        item2.setCategory(savedCategory);
+        Item item2 = createItem(2L,"Game 2", 10.0, "false");
 
         when(itemRepository.findAll(any(Specification.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(savedItem, item2)));
@@ -179,6 +179,8 @@ public class ItemServiceTest {
         assertNotNull(result);
         assertEquals(2, result.getAllItems().size());
         assertTrue(result.getAllItems().stream().allMatch(i -> i.getRating() >= 9.0));
+
+        verify(userService, times(1)).getCurrentUser();
     }
 
     @Test
@@ -192,6 +194,8 @@ public class ItemServiceTest {
         assertNotNull(result);
         assertEquals(1, result.getAllItems().size());
         assertEquals("true", result.getAllItems().get(0).getAdditionalInfo());
+
+        verify(userService, times(1)).getCurrentUser();
     }
 
     @Test
@@ -204,13 +208,24 @@ public class ItemServiceTest {
 
         assertNotNull(result);
         assertTrue(result.getAllItems().isEmpty());
+
+        verify(userService, times(1)).getCurrentUser();
     }
 
 
 
 
 
-
+    private Item createItem(Long id, String title, double rating, String info) {
+        Item item = new Item();
+        item.setId(id);
+        item.setTitle(title);
+        item.setRating(rating);
+        item.setAdditionalInfo(info);
+        item.setCategory(savedCategory);
+        item.setUser(user);
+        return item;
+    }
 
 
 
