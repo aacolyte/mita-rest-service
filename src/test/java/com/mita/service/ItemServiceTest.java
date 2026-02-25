@@ -6,6 +6,7 @@ import com.mita.dto.request.ItemCreateRequest;
 import com.mita.dto.request.ItemUpdateRequest;
 import com.mita.entity.Category;
 import com.mita.entity.Item;
+import com.mita.entity.User;
 import com.mita.repository.CategoryRepository;
 import com.mita.repository.ItemRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,18 +35,29 @@ public class ItemServiceTest {
     private CategoryRepository categoryRepository;
 
     @Mock
-    private CategoryService categoryService;
+    private UploadService uploadService;
+
+    @Mock
+    private UserService userService;
 
     @InjectMocks
     private ItemService itemService;
 
 
-    ItemCreateRequest request;
-    Item savedItem;
-    Category savedCategory;
+    private ItemCreateRequest request;
+    private Item savedItem;
+    private Category savedCategory;
+
+    private User user;
 
     @BeforeEach
     public void setUp(){
+        user = new User();
+        user.setId(1L);
+        user.setEmail("test@test.com");
+
+        when(userService.getCurrentUser()).thenReturn(user);
+
         savedCategory = new Category();
         savedCategory.setId(1L);
         savedCategory.setName("Anime");
@@ -56,13 +68,15 @@ public class ItemServiceTest {
         savedItem.setRating(10.0);
         savedItem.setAdditionalInfo("true");
         savedItem.setCategory(savedCategory);
+
+        savedItem.setUser(user);
     }
 
     @Test
     void shouldCreateItem(){
         request = new ItemCreateRequest("Some game", 10.0, "true", 1L, "some path");
 
-        when(categoryRepository.findById(1L))
+        when(categoryRepository.findByIdAndUser(1L, user))
                 .thenReturn(Optional.of(savedCategory));
 
         when(itemRepository.save(any(Item.class))).thenReturn(savedItem);
@@ -78,7 +92,7 @@ public class ItemServiceTest {
     }
     @Test
     void shouldReturnItemById_WhenItemExists() {
-        when(itemRepository.findById(1L)).thenReturn(Optional.of(savedItem));
+        when(itemRepository.findByIdAndUser(1L,user)).thenReturn(Optional.of(savedItem));
 
         ItemDto result = itemService.getItemById(1L);
 
@@ -87,11 +101,11 @@ public class ItemServiceTest {
         assertEquals("Some game",result.getTitle());
         assertEquals("true",result.getAdditionalInfo());
         assertEquals(10.0,result.getRating());
-        verify(itemRepository, times(1)).findById(1L);
+        verify(itemRepository, times(1)).findByIdAndUser(1L,user);
     }
     @Test
     void shouldThrowException_WhenItemDoesNotExist() {
-        when(itemRepository.findById(99L)).thenReturn(Optional.empty());
+        when(itemRepository.findByIdAndUser(99L,user)).thenReturn(Optional.empty());
 
         IllegalArgumentException ex = assertThrows(
             IllegalArgumentException.class,
@@ -104,7 +118,7 @@ public class ItemServiceTest {
     void shouldUpdateItem_whenItemExists() {
         ItemUpdateRequest request = new ItemUpdateRequest("New title",7.5,"false", "some path");
 
-        when(itemRepository.findById(1L)).thenReturn(Optional.of(savedItem));
+        when(itemRepository.findByIdAndUser(1L,user)).thenReturn(Optional.of(savedItem));
 
         ItemDto result = itemService.updateItem(1L,request);
 
@@ -113,12 +127,12 @@ public class ItemServiceTest {
         assertEquals("New title",result.getTitle());
         assertEquals("false",result.getAdditionalInfo());
         assertEquals(7.5,result.getRating());
-        verify(itemRepository, times(1)).findById(1L);
+        verify(itemRepository, times(1)).findByIdAndUser(1L,user);
         verify(itemRepository, never()).save(any());
     }
     @Test
     void shouldDeleteItem_whenItemExist() {
-        when(itemRepository.existsById(1L)).thenReturn(true);
+        when(itemRepository.findByIdAndUser(1L,user)).thenReturn(Optional.of(savedItem));
         itemService.deleteItemById(1L);
         verify(itemRepository,times(1)).deleteById(1L);
     }
@@ -139,7 +153,7 @@ public class ItemServiceTest {
                 .thenReturn(new PageImpl<>(List.of(savedItem, item2)));
 
         ItemContainerDto result = itemService.getItems(
-                1L, "game", null, null, null, 2,"rating,desc");
+                1L, "game", null, null, null, 2,1,1,"rating,desc");
 
 
         assertNotNull(result);
@@ -160,7 +174,7 @@ public class ItemServiceTest {
                 .thenReturn(new PageImpl<>(List.of(savedItem, item2)));
 
         ItemContainerDto result = itemService.getItems(
-                1L, null, null, 9.0, null, 2,"rating,desc");
+                1L, null, null, 9.0, null, 2,1,1,"rating,desc");
 
         assertNotNull(result);
         assertEquals(2, result.getAllItems().size());
@@ -173,7 +187,7 @@ public class ItemServiceTest {
                 .thenReturn(new PageImpl<>(List.of(savedItem)));
 
         ItemContainerDto result = itemService.getItems(
-                1L, null, null, null, "true",1, "rating,desc");
+                1L, null, null, null, "true",1,1,1, "rating,desc");
 
         assertNotNull(result);
         assertEquals(1, result.getAllItems().size());
@@ -186,7 +200,7 @@ public class ItemServiceTest {
                 .thenReturn(new PageImpl<>(List.of()));
 
         ItemContainerDto result = itemService.getItems(
-                1L, "nonexistent", null, null, null,1, "rating,desc");
+                1L, "nonexistent", null, null, null,1,1,1, "rating,desc");
 
         assertNotNull(result);
         assertTrue(result.getAllItems().isEmpty());
