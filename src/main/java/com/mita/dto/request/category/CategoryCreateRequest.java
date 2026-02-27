@@ -1,7 +1,6 @@
-package com.mita.dto.request;
+package com.mita.dto.request.category;
 
 import com.mita.entity.Category;
-import com.mita.entity.Item;
 
 public class CategoryCreateRequest {
     private String name;

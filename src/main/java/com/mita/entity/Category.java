@@ -54,11 +54,6 @@ public class Category {
         this.name = name;
     }
 
-
-    public CategoryDto toDto() {
-        return new CategoryDto(id,name);
-    }
-
     public User getUser() {
         return user;
     }
@@ -66,4 +61,10 @@ public class Category {
     public void setUser(User user) {
         this.user = user;
     }
+
+    public CategoryDto toDto() {
+        return new CategoryDto(id,name);
+    }
+
+
 }

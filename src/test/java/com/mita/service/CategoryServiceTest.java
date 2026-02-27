@@ -2,8 +2,8 @@ package com.mita.service;
 
 import com.mita.dto.CategoryContainerDto;
 import com.mita.dto.CategoryDto;
-import com.mita.dto.request.CategoryCreateRequest;
-import com.mita.dto.request.CategoryUpdateRequest;
+import com.mita.dto.request.category.CategoryCreateRequest;
+import com.mita.dto.request.category.CategoryUpdateRequest;
 import com.mita.entity.Category;
 import com.mita.entity.User;
 import com.mita.repository.CategoryRepository;
@@ -134,6 +134,8 @@ public class CategoryServiceTest {
         CategoryUpdateRequest request = new CategoryUpdateRequest("New name");
 
         when(categoryRepository.findByIdAndUser(1L,user)).thenReturn(Optional.of(savedCategory));
+        when(categoryRepository.save(any(Category.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
 
         CategoryDto result = categoryService.updateCategory(1L, request);
 
@@ -143,7 +145,7 @@ public class CategoryServiceTest {
 
         verify(userService, times(1)).getCurrentUser();
         verify(categoryRepository, times(1)).findByIdAndUser(1L,user);
-        verify(categoryRepository, never()).save(any());
+        verify(categoryRepository, times(1)).save(any());
     }
 
     @Test

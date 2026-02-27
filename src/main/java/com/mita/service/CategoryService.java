@@ -2,8 +2,8 @@ package com.mita.service;
 
 import com.mita.dto.CategoryContainerDto;
 import com.mita.dto.CategoryDto;
-import com.mita.dto.request.CategoryCreateRequest;
-import com.mita.dto.request.CategoryUpdateRequest;
+import com.mita.dto.request.category.CategoryCreateRequest;
+import com.mita.dto.request.category.CategoryUpdateRequest;
 import com.mita.entity.Category;
 import com.mita.entity.User;
 import com.mita.repository.CategoryRepository;

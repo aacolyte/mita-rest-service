@@ -1,17 +1,20 @@
 package com.mita.service;
 
 import com.mita.dto.UserDto;
-import com.mita.dto.request.UserStatsDto;
+import com.mita.dto.request.user.AboutUpdateRequest;
+import com.mita.dto.request.user.AvatarUpdateRequest;
+import com.mita.dto.request.user.NameUpdateRequest;
+import com.mita.dto.request.user.UserStatsDto;
 import com.mita.entity.User;
 import com.mita.repository.CategoryRepository;
 import com.mita.repository.ItemRepository;
 import com.mita.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
@@ -20,7 +23,8 @@ public class UserService {
     private final ItemRepository itemRepository;
     private final CategoryRepository categoryRepository;
     private final UploadService uploadService;
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
     public UserService(UserRepository userRepository, ItemRepository itemRepository, CategoryRepository categoryRepository, UploadService uploadService) {
         this.userRepository = userRepository;
@@ -32,9 +36,16 @@ public class UserService {
     public User getCurrentUser(){
         Authentication auth =
                 SecurityContextHolder.getContext().getAuthentication();
-        return (User) auth.getPrincipal();
+
+        Object principal = auth.getPrincipal();
+        if(principal instanceof User user){
+            return user;
+        }else{
+            throw new IllegalStateException("User is not authenticated");
+        }
     }
 
+    @Transactional(readOnly = true)
     public UserDto getProfile(Authentication authentication){
         String username = authentication.getName();
 
@@ -42,21 +53,16 @@ public class UserService {
                 .findByEmail(username)
                 .orElseThrow();
 
-        return new UserDto(
-                user.getEmail(),
-                user.getUsernameField(),
-                user.getAvatar(),
-                user.getAbout()
-        );
+        return user.toDto();
     }
 
 
-    public UserDto updateAvatar(Map<String,String> body){
+    public UserDto updateAvatar(AvatarUpdateRequest request){
         User currentUser = getCurrentUser();
 
         String oldAvatar = currentUser.getAvatar();
 
-        String avatar = body.get("avatar");
+        String avatar = request.getAvatar();
         currentUser.setAvatar(avatar);
         userRepository.save(currentUser);
 
@@ -64,41 +70,34 @@ public class UserService {
             uploadService.deletePosterIfExists(oldAvatar);
         }
 
-        return new UserDto(
-                currentUser.getEmail(),
-                currentUser.getUsernameField(),
-                currentUser.getAvatar(),
-                currentUser.getAbout()
-        );
+        log.info("User {} updated avatar", currentUser.getId());
+
+        return currentUser.toDto();
     }
 
-    public UserDto updateAbout(Map<String,String> body){
+    public UserDto updateAbout(AboutUpdateRequest request){
         User currentUser = getCurrentUser();
-        String about = body.get("about");
+        String about = request.getAbout();
         currentUser.setAbout(about);
         userRepository.save(currentUser);
-        return new UserDto(
-                currentUser.getEmail(),
-                currentUser.getUsernameField(),
-                currentUser.getAvatar(),
-                currentUser.getAbout()
-        );
+
+        log.info("User {} updated about", currentUser.getId());
+
+        return currentUser.toDto();
     }
 
-    public UserDto updateName(Map<String,String> body){
+    public UserDto updateName(NameUpdateRequest request){
         User currentUser = getCurrentUser();
-        String name = body.get("name");
+        String name = request.getName();
         currentUser.setUsername(name);
         userRepository.save(currentUser);
-        return new UserDto(
-                currentUser.getEmail(),
-                currentUser.getUsernameField(),
-                currentUser.getAvatar(),
-                currentUser.getAbout()
-        );
+
+        log.info("User {} updated name", currentUser.getId());
+
+        return currentUser.toDto();
     }
 
-
+    @Transactional(readOnly = true)
     public UserStatsDto getUserStats() {
         User currentUser = getCurrentUser();
         int totalItems = itemRepository.countByUserId(currentUser.getId());
@@ -110,22 +109,16 @@ public class UserService {
         );
     }
 
-    public UserDto getUserByEmail(Map<String,String> body) {
-        String email = body.get("email");
+    @Transactional(readOnly = true)
+    public UserDto getUserByEmail(String email) {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("User with email " + email + " not found"));
 
-        return new UserDto(
-                user.getEmail(),
-                user.getUsernameField(),
-                user.getAvatar(),
-                user.getAbout()
-        );
+        return user.toDto();
     }
 
-    public void deleteUserByEmail(Map<String, String> body) {
-        String email = body.get("email");
+    public void deleteUserByEmail(String email) {
         userRepository.deleteByEmail(email);
     }
 

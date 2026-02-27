@@ -2,8 +2,8 @@ package com.mita.service;
 
 import com.mita.dto.ItemContainerDto;
 import com.mita.dto.ItemDto;
-import com.mita.dto.request.ItemCreateRequest;
-import com.mita.dto.request.ItemUpdateRequest;
+import com.mita.dto.request.item.ItemCreateRequest;
+import com.mita.dto.request.item.ItemUpdateRequest;
 import com.mita.entity.Category;
 import com.mita.entity.Item;
 import com.mita.entity.User;
@@ -123,6 +123,7 @@ public class ItemServiceTest {
         ItemUpdateRequest request = new ItemUpdateRequest("New title",7.5,"false", "some path");
 
         when(itemRepository.findByIdAndUser(1L,user)).thenReturn(Optional.of(savedItem));
+        when(itemRepository.save(any(Item.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         ItemDto result = itemService.updateItem(1L,request);
 
@@ -134,7 +135,7 @@ public class ItemServiceTest {
 
         verify(userService, times(1)).getCurrentUser();
         verify(itemRepository, times(1)).findByIdAndUser(1L,user);
-        verify(itemRepository, never()).save(any());
+        verify(itemRepository, times(1)).save(any());
     }
     @Test
     void shouldDeleteItem_whenItemExist() {

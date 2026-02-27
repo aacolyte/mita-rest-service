@@ -3,9 +3,9 @@ package com.mita.service;
 
 import com.mita.dto.ItemContainerDto;
 import com.mita.dto.ItemDto;
-import com.mita.dto.request.ItemCreateRequest;
-import com.mita.dto.request.ItemUpdateRequest;
-import com.mita.dto.request.TopItemsPerCategoryResponse;
+import com.mita.dto.request.item.ItemCreateRequest;
+import com.mita.dto.request.item.ItemUpdateRequest;
+import com.mita.dto.request.item.TopItemsPerCategoryResponse;
 import com.mita.entity.Category;
 import com.mita.entity.Item;
 import com.mita.entity.User;

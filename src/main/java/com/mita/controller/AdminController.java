@@ -20,13 +20,13 @@ public class AdminController {
     }
 
     @GetMapping("/user-by-email")
-    public UserDto getUserByEmail(@RequestParam Map<String, String> body){
-        return userService.getUserByEmail(body);
+    public UserDto getUserByEmail(@RequestParam String email){
+        return userService.getUserByEmail(email);
     }
 
     @DeleteMapping("/delete-user-by-email")
-    public void deleteUserByEmail(@RequestParam Map<String, String> body){
-        userService.deleteUserByEmail(body);
+    public void deleteUserByEmail(@RequestParam String email){
+        userService.deleteUserByEmail(email);
     }
 
 

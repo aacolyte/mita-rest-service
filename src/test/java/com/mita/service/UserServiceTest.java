@@ -1,7 +1,10 @@
 package com.mita.service;
 
 import com.mita.dto.UserDto;
-import com.mita.dto.request.UserStatsDto;
+import com.mita.dto.request.user.AboutUpdateRequest;
+import com.mita.dto.request.user.AvatarUpdateRequest;
+import com.mita.dto.request.user.NameUpdateRequest;
+import com.mita.dto.request.user.UserStatsDto;
 import com.mita.entity.User;
 import com.mita.repository.CategoryRepository;
 import com.mita.repository.ItemRepository;
@@ -16,7 +19,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -76,9 +78,9 @@ class UserServiceTest {
     void updateAvatar_shouldUpdateAvatarAndDeleteOldOne() {
         mockSecurityContext();
 
-        Map<String, String> body = Map.of("avatar", "new-avatar.png");
+        AvatarUpdateRequest request = new AvatarUpdateRequest("new-avatar.png");
 
-        UserDto result = userService.updateAvatar(body);
+        UserDto result = userService.updateAvatar(request);
 
         assertEquals("new-avatar.png", user.getAvatar());
         verify(userRepository).save(user);
@@ -90,9 +92,9 @@ class UserServiceTest {
     void updateAvatar_shouldNotDeleteIfSameAvatar() {
         mockSecurityContext();
 
-        Map<String, String> body = Map.of("avatar", "old-avatar.png");
+        AvatarUpdateRequest request = new AvatarUpdateRequest("old-avatar.png");
 
-        userService.updateAvatar(body);
+        userService.updateAvatar(request);
 
         verify(uploadService, never()).deletePosterIfExists(any());
     }
@@ -102,9 +104,9 @@ class UserServiceTest {
     void updateAbout_shouldUpdateAbout() {
         mockSecurityContext();
 
-        Map<String, String> body = Map.of("about", "new about");
+        AboutUpdateRequest request = new AboutUpdateRequest("new about");
 
-        UserDto result = userService.updateAbout(body);
+        UserDto result = userService.updateAbout(request);
 
         assertEquals("new about", user.getAbout());
         verify(userRepository).save(user);
@@ -115,9 +117,9 @@ class UserServiceTest {
     void updateName_shouldUpdateUsername() {
         mockSecurityContext();
 
-        Map<String, String> body = Map.of("name", "newName");
+        NameUpdateRequest request = new NameUpdateRequest("newName");
 
-        UserDto result = userService.updateName(body);
+        UserDto result = userService.updateName(request);
 
         assertEquals("newName", user.getUsernameField());
         verify(userRepository).save(user);
@@ -147,9 +149,9 @@ class UserServiceTest {
         when(userRepository.findByEmail("test@mail.com"))
                 .thenReturn(Optional.of(user));
 
-        Map<String, String> body = Map.of("email", "test@mail.com");
+        String email = "test@mail.com";
 
-        UserDto result = userService.getUserByEmail(body);
+        UserDto result = userService.getUserByEmail(email);
 
         assertEquals("test@mail.com", result.getEmail());
         verify(userRepository).findByEmail("test@mail.com");
@@ -160,18 +162,19 @@ class UserServiceTest {
         when(userRepository.findByEmail("notfound@mail.com"))
                 .thenReturn(Optional.empty());
 
-        Map<String, String> body = Map.of("email", "notfound@mail.com");
+        String email = "notfound@mail.com";
 
         assertThrows(IllegalArgumentException.class,
-                () -> userService.getUserByEmail(body));
+                () -> userService.getUserByEmail(email));
     }
 
 
     @Test
     void deleteUserByEmail_shouldCallRepository() {
-        Map<String, String> body = Map.of("email", "test@mail.com");
 
-        userService.deleteUserByEmail(body);
+        String email = "test@mail.com";
+
+        userService.deleteUserByEmail(email);
 
         verify(userRepository).deleteByEmail("test@mail.com");
     }

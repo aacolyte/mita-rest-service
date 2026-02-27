@@ -1,4 +1,4 @@
-package com.mita.dto.request;
+package com.mita.dto.request.user;
 
 public class UserStatsDto {
     private int totalItems;

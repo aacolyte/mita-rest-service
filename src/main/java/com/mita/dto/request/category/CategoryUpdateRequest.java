@@ -1,4 +1,4 @@
-package com.mita.dto.request;
+package com.mita.dto.request.category;
 
 import com.mita.entity.Category;
 
