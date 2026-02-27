@@ -1,7 +1,6 @@
 package com.mita.service;
 
 
-import exception.ValidationException;
 import com.mita.dto.ItemContainerDto;
 import com.mita.dto.ItemDto;
 import com.mita.dto.request.ItemCreateRequest;
@@ -13,8 +12,10 @@ import com.mita.entity.User;
 import com.mita.repository.CategoryRepository;
 import com.mita.repository.ItemRepository;
 import com.mita.specification.ItemSpecification;
+import exception.ValidationException;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,16 +30,15 @@ import java.util.List;
 public class ItemService {
 
     private final CategoryRepository categoryRepository;
-    private final CategoryService categoryService;
     private final UserService userService;
-    private ItemRepository itemRepository;
+    private final ItemRepository itemRepository;
     private final UploadService uploadService;
+    private static final Logger log = LoggerFactory.getLogger(ItemService.class);
 
-    @Autowired
-    public ItemService(ItemRepository itemRepository, CategoryRepository categoryRepository, CategoryService categoryService, UserService userService, UploadService uploadService) {
+
+    public ItemService(ItemRepository itemRepository, CategoryRepository categoryRepository, UserService userService, UploadService uploadService) {
         this.itemRepository = itemRepository;
         this.categoryRepository = categoryRepository;
-        this.categoryService = categoryService;
         this.userService = userService;
         this.uploadService = uploadService;
     }
@@ -113,9 +113,15 @@ public class ItemService {
             Category category = categoryRepository.findByIdAndUser(request.getCategoryId(), user).orElseThrow(
                     () -> new IllegalArgumentException("Category with id: " + request.getCategoryId() + " not found")
             );
+
             Item item = request.toEntity(category);
             item.setUser(user);
-            return itemRepository.save(item).toDto();
+
+            Item saved  = itemRepository.save(item);
+
+            log.info("Created item {} for user {}", saved.getId(), user.getId());
+            return saved.toDto();
+
         }catch (ValidationException e) {
             if(request.getPoster() != null) {
                 uploadService.deletePosterIfExists(request.getPoster());
@@ -138,7 +144,10 @@ public class ItemService {
                 uploadService.deletePosterIfExists(oldPoster);
             }
 
-            return item.toDto();
+            Item saved = itemRepository.save(item);
+
+            log.info("Updated item {} for user {}", saved.getId(), user.getId());
+            return saved.toDto();
 
         }catch (ValidationException e) {
             if(request.getPoster() != null &&
@@ -157,6 +166,8 @@ public class ItemService {
 
         uploadService.deletePosterIfExists(item.getPoster());
         itemRepository.deleteById(id);
+
+        log.info("Deleted item {} for user {}", id, user.getId());
     }
 
 
