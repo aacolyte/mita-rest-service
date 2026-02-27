@@ -1,7 +1,8 @@
 package com.mita.service;
 
-import com.mita.repository.ItemRepository;
-import jakarta.transaction.Transactional;
+import exception.FileStorageException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -15,40 +16,58 @@ import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 @Service
-@Transactional
 public class UploadService {
 
-    private final ItemRepository itemRepository;
+    private final Path root = Paths.get("posters").toAbsolutePath().normalize();
 
-    public UploadService(ItemRepository itemRepository) {
-        this.itemRepository = itemRepository;
-    }
+    private static final Logger log = LoggerFactory.getLogger(UploadService.class);
+
 
     public String upload(MultipartFile file) throws IOException {
         if (file.isEmpty()) {
-            throw new RuntimeException("File is empty");
+            throw new FileStorageException("File is empty");
         }
-        if (!file.getContentType().startsWith("image/")) {
-            throw new RuntimeException("Only image files are allowed");
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new FileStorageException("Only image files are allowed");
         }
 
         String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-        Path path = Paths.get("posters/").resolve(fileName);
+        Path path = root.resolve(fileName);
 
         Files.createDirectories(path.getParent());
         Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+
+        log.info("Uploaded poster {}", fileName);
         return fileName;
     }
 
 
     public Resource getPoster(String filename) throws IOException {
-        Path path = Paths.get("posters").resolve(filename);
-        return new UrlResource(path.toUri());
+        Path filePath = root.resolve(filename).normalize();
+
+        if (!filePath.startsWith(root)) {
+            throw new FileStorageException("Invalid file path");
+        }
+
+        if (!Files.exists(filePath)) {
+            throw new FileStorageException("File not found: " + filename);
+        }
+        return new UrlResource(filePath.toUri());
     }
 
     public String getContentType(String filename) throws IOException {
-        Path path = Paths.get("posters").resolve(filename);
-        return Files.probeContentType(path);
+        Path filePath = root.resolve(filename).normalize();
+
+        if (!filePath.startsWith(root)) {
+            throw new FileStorageException("Invalid file path");
+        }
+
+        if (!Files.exists(filePath)) {
+            throw new FileStorageException("File not found: " + filename);
+        }
+
+        return Files.probeContentType(filePath);
     }
 
 
@@ -56,13 +75,17 @@ public class UploadService {
 
         if(poster == null || poster.isBlank()) return;
         try{
-            Path filePath = Paths.get("posters").toAbsolutePath().resolve(poster).normalize();
-            if(!filePath.startsWith(filePath)){
+            Path filePath = root.resolve(poster).normalize();
+            if(!filePath.startsWith(root)){
                 return;
             }
+
             Files.deleteIfExists(filePath);
+
+            log.info("Deleted poster {}", poster);
+
         } catch (IOException e) {
-            System.err.println("Failed to delete poster: " + poster);
+            log.warn("Failed to delete poster {}", poster, e);
         }
     }
 
