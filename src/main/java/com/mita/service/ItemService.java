@@ -1,7 +1,7 @@
 package com.mita.service;
 
 
-import com.mita.ValidationException;
+import exception.ValidationException;
 import com.mita.dto.ItemContainerDto;
 import com.mita.dto.ItemDto;
 import com.mita.dto.request.ItemCreateRequest;

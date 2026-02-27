@@ -1,6 +1,6 @@
 package com.mita.controller;
 
-import com.mita.ValidationException;
+import exception.ValidationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
