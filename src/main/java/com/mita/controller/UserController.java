@@ -5,8 +5,8 @@ import com.mita.dto.request.user.AboutUpdateRequest;
 import com.mita.dto.request.user.AvatarUpdateRequest;
 import com.mita.dto.request.user.NameUpdateRequest;
 import com.mita.dto.request.user.UserStatsDto;
-import com.mita.repository.UserRepository;
 import com.mita.service.UserService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,38 +14,36 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/users")
 public class UserController {
 
-    private final UserRepository userRepository;
     private final UserService userService;
 
-    public UserController(UserRepository userRepository, UserService userService) {
-        this.userRepository = userRepository;
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
     @GetMapping("/profile")
-    public UserDto getProfile(Authentication authentication) {
-        return userService.getProfile(authentication);
+    public ResponseEntity<UserDto> getProfile(Authentication authentication) {
+        return ResponseEntity.ok(userService.getProfile(authentication));
     }
 
     @PutMapping("/avatar")
-    public UserDto updateAvatar(@RequestBody AvatarUpdateRequest request){
-        return userService.updateAvatar(request);
+    public ResponseEntity<UserDto> updateAvatar(@RequestBody AvatarUpdateRequest request){
+        return ResponseEntity.ok(userService.updateAvatar(request));
     }
 
 
     @PutMapping("/about")
-    public UserDto updateAbout(@RequestBody AboutUpdateRequest request){
-        return userService.updateAbout(request);
+    public ResponseEntity<UserDto> updateAbout(@RequestBody AboutUpdateRequest request){
+        return ResponseEntity.ok(userService.updateAbout(request));
     }
 
     @PutMapping("/name")
-    public UserDto updateName(@RequestBody NameUpdateRequest request){
-        return userService.updateName(request);
+    public ResponseEntity<UserDto> updateName(@RequestBody NameUpdateRequest request){
+        return ResponseEntity.ok(userService.updateName(request));
     }
 
     @GetMapping("/stats")
-    public UserStatsDto getUserStats(){
-        return userService.getUserStats();
+    public ResponseEntity<UserStatsDto> getUserStats(){
+        return ResponseEntity.ok(userService.getUserStats());
     }
 
 }

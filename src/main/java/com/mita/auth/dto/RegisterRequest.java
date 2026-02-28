@@ -2,14 +2,9 @@ package com.mita.auth.dto;
 
 public class RegisterRequest {
 
-    private String email;
-    private String name;
-    private String password;
-
-
-
-    public RegisterRequest() {
-    }
+    private final String email;
+    private final String name;
+    private final String password;
 
     public RegisterRequest(String email, String name, String password) {
         this.email = email;

@@ -1,59 +1,58 @@
 package com.mita.controller;
 
+import exception.ErrorResponse;
 import exception.ValidationException;
+import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.Map;
+import java.time.Instant;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     // Catching exceptions from services
     @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleIllegalArgument(IllegalArgumentException ex){
-        return Map.of("error", ex.getMessage());
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex,
+                                                               HttpServletRequest request){
+        log.warn("Illegal argument", ex.getMessage());
+
+        return buildError(ex.getMessage(),HttpStatus.BAD_REQUEST, request);
     }
 
     // Catching database constraint violations
     @ExceptionHandler(DataIntegrityViolationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException ex,
+                                                            HttpServletRequest request) {
         String message = "Invalid data";
         Throwable cause = ex.getMostSpecificCause();
         String text = cause.getMessage().toLowerCase();
 
-        if (text.contains("unique") && text.contains("title")) {
-            message = "Item title must be unique";
-        }
         if (text.contains("unique") && text.contains("name")) {
             message = "Category name must be unique";
         }
+        log.warn("Database constraint violation", ex.getMessage());
 
-        return Map.of("error", message);
+        return buildError(message,HttpStatus.BAD_REQUEST,request);
     }
 
-//    @ExceptionHandler(MethodArgumentNotValidException.class)
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public Map<String, String> handleValidationException(MethodArgumentNotValidException ex){
-//        Map<String, String> errors = new HashMap<>();
-//
-//        for(FieldError fieldError : ex.getBindingResult().getFieldErrors()){
-//            errors.put(fieldError.getField(), fieldError.getDefaultMessage());
-//        }
-//        return errors;
-//    }
+
 
     @ExceptionHandler(ValidationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleValidation(ValidationException ex){
-        return Map.of("error", ex.getMessage());
+    public ResponseEntity<ErrorResponse> handleValidation(ValidationException ex,
+                                                          HttpServletRequest request) {
+
+        log.warn("Validation error", ex.getMessage());
+
+        return buildError(ex.getMessage(),HttpStatus.BAD_REQUEST,request);
     }
 
 
@@ -61,9 +60,29 @@ public class GlobalExceptionHandler {
 
     // JSON is malformed, type mismatch
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleJsonParseError(HttpMessageNotReadableException ex) {
-        return Map.of("error", "Invalid request body. Check data types.");
+    public ResponseEntity<ErrorResponse> handleJsonParseError(HttpMessageNotReadableException ex,
+                                                              HttpServletRequest request) {
+
+        log.warn("Invalid request body", ex.getMessage());
+
+        return buildError("Invalid request body. Check data types",HttpStatus.BAD_REQUEST,request);
     }
 
+
+
+    private ResponseEntity<ErrorResponse> buildError(
+            String message,
+            HttpStatus status,
+            HttpServletRequest request
+    ) {
+        ErrorResponse error = new ErrorResponse(
+                message,
+                status.value(),
+                Instant.now(),
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(error, status);
+    }
 }
+
+

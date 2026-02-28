@@ -15,7 +15,6 @@ public class ItemCreateRequest {
 
     private String poster;
 
-    public ItemCreateRequest() {}
 
     public ItemCreateRequest(String title, Double rating, String additionalInfo, Long categoryId, String poster) {
         this.title = title;

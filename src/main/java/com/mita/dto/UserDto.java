@@ -1,10 +1,10 @@
 package com.mita.dto;
 
 public class UserDto {
-    String username;
-    String email;
-    String avatar;
-    String about;
+    private final String username;
+    private final String email;
+    private final String avatar;
+    private final String about;
 
     public UserDto(String email, String username, String avatar, String about) {
         this.email = email;

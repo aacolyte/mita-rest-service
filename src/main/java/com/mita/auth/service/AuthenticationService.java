@@ -10,6 +10,8 @@ import com.mita.repository.RefresherTokenRepository;
 import com.mita.repository.UserRepository;
 import com.mita.security.JwtService;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,6 +31,7 @@ public class AuthenticationService {
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final Logger log = LoggerFactory.getLogger(AuthenticationService.class);
 
 
     public AuthenticationService(PasswordEncoder passwordEncoder, UserRepository repository, JwtService jwtService, AuthenticationManager authenticationManager, RefresherTokenRepository refresherTokenRepository) {
@@ -49,6 +52,8 @@ public class AuthenticationService {
 
 
         userRepository.save(user);
+        log.info("User {} registered", user.getEmail());
+
 
         return buildTokens(user);
     }
@@ -62,6 +67,8 @@ public class AuthenticationService {
         );
         var user = userRepository.findByEmail(request.getEmail()).orElseThrow();
 
+        log.info("User {} logged in", user.getEmail());
+
         return buildTokens(user);
     }
 
@@ -74,7 +81,7 @@ public class AuthenticationService {
         refreshTokenEntity.setUser(user);
         refreshTokenEntity.setExpiryDate(
                 Date.from(LocalDateTime.now()
-                        .plusDays(7)
+                        .plusDays(30)
                         .atZone(ZoneId.systemDefault())
                         .toInstant())
         );
@@ -86,24 +93,26 @@ public class AuthenticationService {
     @Transactional
     public AuthenticationResponse refresh(String refreshToken) {
 
-        int deleted = refresherTokenRepository.deleteByToken(refreshToken);
+        RefreshToken tokenEntity = refresherTokenRepository.findByToken(refreshToken)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired refresh token"));
 
-        if (deleted == 0) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "Invalid or expired refresh token"
-            );
-
-        }
         String email = jwtService.getEmailFromToken(refreshToken);
 
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
+
+        refresherTokenRepository.delete(tokenEntity);
+
+        log.info("Refresh for user {}", user.getEmail());
 
         return buildTokens(user);
     }
 
 
     public void deleteRefreshToken(String refreshToken) {
-        refresherTokenRepository.findByToken(refreshToken).ifPresent(refresherTokenRepository::delete);
+        refresherTokenRepository.findByToken(refreshToken).ifPresent(token -> {
+            refresherTokenRepository.delete(token);
+            log.info("Deleted refresh token for user {}", token.getUser().getEmail());
+        });
     }
 }

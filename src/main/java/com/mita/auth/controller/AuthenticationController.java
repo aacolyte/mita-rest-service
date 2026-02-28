@@ -2,27 +2,22 @@ package com.mita.auth.controller;
 
 import com.mita.auth.dto.AuthenticationRequest;
 import com.mita.auth.dto.AuthenticationResponse;
-import com.mita.auth.service.AuthenticationService;
 import com.mita.auth.dto.RegisterRequest;
-import com.mita.repository.RefresherTokenRepository;
+import com.mita.auth.service.AuthenticationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
-
 @RestController
 @RequestMapping("/api/auth")
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
-    private final RefresherTokenRepository refresherTokenRepository;
 
-    public AuthenticationController(AuthenticationService service, AuthenticationService authenticationService, RefresherTokenRepository refresherTokenRepository) {
+    public AuthenticationController(AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
-        this.refresherTokenRepository = refresherTokenRepository;
     }
 
     @PostMapping("/register")
@@ -41,16 +36,15 @@ public class AuthenticationController {
 
     @PostMapping("/refresh")
     public ResponseEntity<AuthenticationResponse> refresh(
-            @RequestBody Map<String, String> request
+            @RequestBody String refreshToken
     ){
-        String refreshToken = request.get("refreshToken");
 
         return ResponseEntity.ok(authenticationService.refresh(refreshToken));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestBody Map<String, String> request) {
-        String refreshToken = request.get("refreshToken");
+    public ResponseEntity<?> logout(@RequestBody String refreshToken) {
+
         if(refreshToken != null) {
             authenticationService.deleteRefreshToken(refreshToken);
         }

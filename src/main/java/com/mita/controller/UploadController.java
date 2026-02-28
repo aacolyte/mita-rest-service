@@ -21,8 +21,8 @@ public class UploadController {
     }
 
     @PostMapping("/upload")
-    public String upload(@RequestParam MultipartFile file) throws IOException {
-        return uploadService.upload(file);
+    public ResponseEntity<String> upload(@RequestParam MultipartFile file) throws IOException {
+        return ResponseEntity.ok(uploadService.upload(file));
     }
 
     @GetMapping("/posters/{filename}")
@@ -35,9 +35,11 @@ public class UploadController {
     }
 
     @PostMapping("/posters/delete")
-    public void deletePoster(@RequestBody Map<String, String> body){
+    public ResponseEntity<Void> deletePoster(@RequestBody Map<String, String> body){
         String poster = body.get("poster");
         uploadService.deletePosterIfExists(poster);
+
+        return ResponseEntity.noContent().build();
     }
 
 

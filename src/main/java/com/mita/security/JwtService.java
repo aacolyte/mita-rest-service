@@ -59,7 +59,7 @@ public class JwtService {
 
 
     public String generateAccessToken(UserDetails user) {
-        Date date = Date.from(LocalDateTime.now().plusMinutes(1).atZone(ZoneId.systemDefault()).toInstant());
+        Date date = Date.from(LocalDateTime.now().plusMinutes(15).atZone(ZoneId.systemDefault()).toInstant());
         return Jwts.builder()
                 .setSubject(user.getUsername())
                 .claim("type","access")

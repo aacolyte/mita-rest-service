@@ -2,11 +2,8 @@ package com.mita.auth.dto;
 
 public class AuthenticationRequest {
 
-    private String email;
-    private String password;
-
-    public AuthenticationRequest() {
-    }
+    private final String email;
+    private final String password;
 
     public AuthenticationRequest(String email, String password) {
         this.email = email;

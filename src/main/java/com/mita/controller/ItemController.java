@@ -6,7 +6,7 @@ import com.mita.dto.request.item.ItemCreateRequest;
 import com.mita.dto.request.item.ItemUpdateRequest;
 import com.mita.dto.request.item.TopItemsPerCategoryResponse;
 import com.mita.service.ItemService;
-import com.mita.service.UploadService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,18 +15,16 @@ import java.util.List;
 @RequestMapping("/api/items")
 public class ItemController {
 
-    private final UploadService uploadService;
     private ItemService itemService;
 
-    public ItemController(ItemService itemService, UploadService uploadService) {
+    public ItemController(ItemService itemService) {
         this.itemService = itemService;
-        this.uploadService = uploadService;
     }
 
 
 
     @GetMapping
-    public ItemContainerDto getItems(
+    public ResponseEntity<ItemContainerDto> getItems(
             @RequestParam Long categoryId,
             @RequestParam(required = false) String title,
             @RequestParam(required = false) Double rating,
@@ -38,7 +36,7 @@ public class ItemController {
 
             @RequestParam(required = false, defaultValue = "rating,desc") String sort
             ) {
-        return itemService.getItems(
+        return ResponseEntity.ok(itemService.getItems(
                 categoryId,
                 title,
                 rating,
@@ -48,37 +46,39 @@ public class ItemController {
                 page,
                 size,
                 sort
-        );
+        ));
     }
 
     @GetMapping("/{id}")
-    public ItemDto getItemById(@PathVariable Long id){
-        return itemService.getItemById(id);
+    public ResponseEntity<ItemDto> getItemById(@PathVariable Long id){
+        return ResponseEntity.ok(itemService.getItemById(id));
     }
 
 
     @PostMapping
-    public ItemDto createItem(@RequestBody ItemCreateRequest request) {
-        return itemService.createItem(request);
+    public ResponseEntity<ItemDto> createItem(@RequestBody ItemCreateRequest request) {
+        return ResponseEntity.ok(itemService.createItem(request));
     }
 
 
     @PutMapping("/{id}")
-    public ItemDto updateItem(@PathVariable Long id, @RequestBody ItemUpdateRequest request) {
-        return itemService.updateItem(id,request);
+    public ResponseEntity<ItemDto> updateItem(@PathVariable Long id, @RequestBody ItemUpdateRequest request) {
+        return ResponseEntity.ok(itemService.updateItem(id,request));
     }
 
 
     @DeleteMapping("/{id}")
-    public void deleteItemById(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteItemById(@PathVariable Long id) {
         itemService.deleteItemById(id);
+
+        return ResponseEntity.noContent().build();
     }
 
 
 
     @GetMapping("/top-items")
-    public List<TopItemsPerCategoryResponse> topItemsPerCategory(){
-        return itemService.getTopItemsPerCategory();
+    public ResponseEntity<List<TopItemsPerCategoryResponse>> topItemsPerCategory(){
+        return ResponseEntity.ok(itemService.getTopItemsPerCategory());
     }
 
 
