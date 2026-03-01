@@ -1,6 +1,6 @@
 package com.mita.service;
 
-import exception.FileStorageException;
+import com.mita.exception.FileStorageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;

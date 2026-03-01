@@ -12,7 +12,7 @@ import com.mita.entity.User;
 import com.mita.repository.CategoryRepository;
 import com.mita.repository.ItemRepository;
 import com.mita.specification.ItemSpecification;
-import exception.ValidationException;
+import com.mita.exception.ValidationException;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
