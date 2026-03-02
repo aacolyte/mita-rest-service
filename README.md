@@ -1,11 +1,23 @@
-# mita-rest-service
-
-Please note: This repository contains only the back-end part of the application.
+# Mita
 
 ## 📚 Mita
 
 Full-stack Library Management System with role-based access control and JWT authentication.
 Built with Spring Boot and React.
+
+## 📖 Table of Contents
+- [About The Project](#-about-the-project)
+- [Features](#-features)
+- [Tech Stack](#-tech-stack)
+- [Security](#-security)
+- [Architecture](#-architecture)
+- [Database Architecture](#-database-architecture)
+- [REST API Structure](#-rest-api-structure)
+- [Screenshots](#-how-it-looks)
+- [How to Run](#-how-to-run)
+
+Please note: This repository contains only the back-end part of the application.
+
 
 ## 🚀 About The Project
 
@@ -95,7 +107,7 @@ flowchart TD
     A[React SPA] --> B[Spring Boot REST API]
     B --> C[PostgreSQL Database]
 ```
-## Database Architecture
+## 🗄 Database Architecture
 
 There is three main tables in database
 
@@ -107,29 +119,29 @@ erDiagram
     CATEGORY ||--o{ ITEM : contains
 
     USER {
-        id Long
-        username String
-        email String
-        password String
-        avatar String
-        about String
-        role Role
+        Long id 
+        String username
+        String email
+        String password 
+        String avatar 
+        String about 
+        Role role 
     }
 
     CATEGORY {
-        id Long
-        name String
-        userId Long
+        Long id 
+        String name 
+        Long userId
     }
 
     ITEM {
-        id Long
-        title String
-        rating Double
-        additionalInfo String
-        poster String
-        userId Long
-        categoryId Long
+        Long id 
+        String title 
+        Double rating
+        String additionalInfo 
+        String poster
+        Long userId 
+        Long categoryId 
     }
 ```
 
@@ -183,12 +195,66 @@ erDiagram
 | DELETE | /api/admin/user-by-email | ADMIN  | Delete user by email |
 
 
-## How it looks
+## 🔍 How it looks
+
+**Main page have several blocks:**
+
+- Categories list
+- Items list
+- Filter bar
+- Hidden navigation bar
+
+<p align="center">
+  <img src="readme_images/main_page.png" alt="Main page">
+</p>
+
+**Profile page:**
+
+- Avatar and name
+- About block
+- Best items for each category
+- Logout button
+
+<p align="center">
+  <img src="readme_images/profile.png" alt="Main page">
+</p>
 
 
+**Add item page:**
 
+- Input fields
+- Preview card
+- Submit button
+- Cancel button
 
+<p align="center">
+  <img src="readme_images/add_item.png" alt="Main page">
+</p>
 
+**Registration page:**
+
+<p align="center">
+  <img src="readme_images/register.png" alt="Main page">
+</p>
+
+**Login page:**
+
+<p align="center">
+  <img src="readme_images/login.png" alt="Main page">
+</p>
+
+## 🚀 How to Run
+**Backend**
+
+```code
+mvn spring-boot:run
+```
+
+**Runs on:**
+
+```code
+http://localhost:8080
+```
 
 
 
