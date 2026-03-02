@@ -8,10 +8,9 @@ import com.mita.dto.request.category.CategoryUpdateRequest;
 import com.mita.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 @RequestMapping("/api/categories")
 public class CategoryController {
 
@@ -22,30 +21,30 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    @ResponseBody
+
     @GetMapping
     public ResponseEntity<CategoryContainerDto> getAllCategories() {
         return ResponseEntity.ok(categoryService.getAllCategories());
     }
 
-    @ResponseBody
+
     @GetMapping("/{id}")
     public ResponseEntity<CategoryDto> getCategoryById(@PathVariable Long id) {
         return ResponseEntity.ok(categoryService.getCategoryById(id));
     }
 
-    @ResponseBody
+
     @PostMapping
     public ResponseEntity<CategoryDto> createCategory(@RequestBody CategoryCreateRequest request) {
         return ResponseEntity.ok(categoryService.createCategory(request));
     }
-    @ResponseBody
+
     @PutMapping("/{id}")
     public ResponseEntity<CategoryDto> updateCategory(@PathVariable Long id, @RequestBody CategoryUpdateRequest request) {
         return ResponseEntity.ok(categoryService.updateCategory(id, request));
     }
 
-    @ResponseBody
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCategoryById(@PathVariable Long id) {
         categoryService.deleteCategoryById(id);
