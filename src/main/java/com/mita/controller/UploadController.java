@@ -29,6 +29,11 @@ public class UploadController {
     public ResponseEntity<Resource> getPoster(@PathVariable String filename) throws IOException {
         Resource resource = uploadService.getPoster(filename);
         String contentType = uploadService.getContentType(filename);
+
+        if (resource == null) {
+            return ResponseEntity.notFound().build();
+        }
+
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
                 .body(resource);

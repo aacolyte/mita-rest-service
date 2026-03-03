@@ -51,7 +51,7 @@ public class UploadService {
         }
 
         if (!Files.exists(filePath)) {
-            throw new FileStorageException("File not found: " + filename);
+            return null;
         }
         return new UrlResource(filePath.toUri());
     }
@@ -64,7 +64,7 @@ public class UploadService {
         }
 
         if (!Files.exists(filePath)) {
-            throw new FileStorageException("File not found: " + filename);
+            return null;
         }
 
         return Files.probeContentType(filePath);
