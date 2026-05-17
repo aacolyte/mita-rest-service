@@ -1,5 +1,6 @@
 package com.mita.service;
 
+import com.mita.dto.PublicUserDto;
 import com.mita.dto.UserDto;
 import com.mita.dto.request.user.AboutUpdateRequest;
 import com.mita.dto.request.user.AvatarUpdateRequest;
@@ -117,6 +118,26 @@ public class UserService {
 
         return user.toDto();
     }
+
+
+    @Transactional(readOnly = true)
+    public PublicUserDto getUserByUsernamePublic(String username){
+        User user =  userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User with username " + username + " not found"));
+
+        return user.toPublicDto();
+    }
+
+    @Transactional(readOnly = true)
+    public User getUserByUsernamePrivate(String username){
+        User user =  userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User with username " + username + " not found"));
+
+        return user;
+    }
+
+
+
 
     public void deleteUserByEmail(String email) {
         userRepository.deleteByEmail(email);

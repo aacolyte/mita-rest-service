@@ -77,8 +77,10 @@ public class ItemController {
 
 
     @GetMapping("/top-items")
-    public ResponseEntity<List<TopItemsPerCategoryResponse>> topItemsPerCategory(){
-        return ResponseEntity.ok(itemService.getTopItemsPerCategory());
+    public ResponseEntity<List<TopItemsPerCategoryResponse>> topItemsPerCategory(
+            @RequestParam(required = false) String username
+    ){
+        return ResponseEntity.ok(itemService.getTopItemsPerCategory(username));
     }
 
 

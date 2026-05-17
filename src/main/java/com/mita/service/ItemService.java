@@ -173,8 +173,15 @@ public class ItemService {
 
 
 
-    public List<TopItemsPerCategoryResponse> getTopItemsPerCategory() {
-        User user = userService.getCurrentUser();
+    public List<TopItemsPerCategoryResponse> getTopItemsPerCategory(String username) {
+        User user;
+
+        if(username != null && !username.isBlank()){
+            user = userService.getUserByUsernamePrivate(username);
+        }else {
+            user = userService.getCurrentUser();
+        }
+
 
         List<Item> topItems =
                 itemRepository.findTopItemsPerCategory(user.getId());

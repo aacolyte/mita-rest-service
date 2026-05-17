@@ -1,5 +1,6 @@
 package com.mita.controller;
 
+import com.mita.dto.PublicUserDto;
 import com.mita.dto.UserDto;
 import com.mita.dto.request.user.AboutUpdateRequest;
 import com.mita.dto.request.user.AvatarUpdateRequest;
@@ -44,6 +45,11 @@ public class UserController {
     @GetMapping("/stats")
     public ResponseEntity<UserStatsDto> getUserStats(){
         return ResponseEntity.ok(userService.getUserStats());
+    }
+
+    @GetMapping("/{username}")
+    public ResponseEntity<PublicUserDto> getUserByUsername(@PathVariable String username){
+        return ResponseEntity.ok(userService.getUserByUsernamePublic(username));
     }
 
 }

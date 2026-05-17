@@ -1,5 +1,6 @@
 package com.mita.entity;
 
+import com.mita.dto.PublicUserDto;
 import com.mita.dto.UserDto;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,7 +19,7 @@ public class User implements UserDetails {
     @Column
     private Long id;
 
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private String username;
 
     @Column
@@ -143,5 +144,9 @@ public class User implements UserDetails {
 
     public UserDto toDto(){
         return new UserDto(email,username,avatar,about);
+    }
+
+    public PublicUserDto toPublicDto(){
+        return new PublicUserDto(username,avatar,about);
     }
 }
