@@ -8,6 +8,7 @@ import com.mita.dto.request.user.NameUpdateRequest;
 import com.mita.dto.request.user.UserStatsDto;
 import com.mita.entity.User;
 import com.mita.repository.CategoryRepository;
+import com.mita.repository.FollowRepository;
 import com.mita.repository.ItemRepository;
 import com.mita.repository.UserRepository;
 import org.slf4j.Logger;
@@ -16,6 +17,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Transactional
@@ -26,12 +29,14 @@ public class UserService {
     private final UploadService uploadService;
     private final UserRepository userRepository;
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
+    private final FollowRepository followRepository;
 
-    public UserService(UserRepository userRepository, ItemRepository itemRepository, CategoryRepository categoryRepository, UploadService uploadService) {
+    public UserService(UserRepository userRepository, ItemRepository itemRepository, CategoryRepository categoryRepository, UploadService uploadService, FollowRepository followRepository) {
         this.userRepository = userRepository;
         this.itemRepository = itemRepository;
         this.categoryRepository = categoryRepository;
         this.uploadService = uploadService;
+        this.followRepository = followRepository;
     }
 
     public User getCurrentUser(){
@@ -125,7 +130,16 @@ public class UserService {
         User user =  userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User with username " + username + " not found"));
 
-        return user.toPublicDto();
+        long followers = followRepository.countByFollowingId(user.getId());
+        long followings = followRepository.countByFollowerId(user.getId());
+
+        return new PublicUserDto(
+                user.getUsernameField(),
+                user.getAvatar(),
+                user.getAbout(),
+                followers,
+                followings
+        );
     }
 
     @Transactional(readOnly = true)
@@ -136,13 +150,22 @@ public class UserService {
         return user;
     }
 
-
-
-
     public void deleteUserByEmail(String email) {
         userRepository.deleteByEmail(email);
     }
 
+    public List<PublicUserDto> searchUsers(String name){
+        return userRepository.findTop10ByUsernameContainingIgnoreCase(name)
+                .stream()
+                .map(user -> new PublicUserDto(
+                        user.getUsernameField(),
+                        user.getAvatar(),
+                        user.getAbout(),
+                        0,
+                        0
+                ))
+                .toList();
+    }
 
 
 }
