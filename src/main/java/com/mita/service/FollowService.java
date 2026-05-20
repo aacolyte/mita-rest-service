@@ -31,10 +31,10 @@ public class FollowService {
             return;
         }
 
-        if(!followRepository.existsByFollowerIdAndFollowingId(
+        if(!followRepository.existsByFollower_IdAndFollowing_Id(
                 current.getId(), target.getId()
         )){
-            followRepository.save(new Follow(current.getId(), target.getId()));
+            followRepository.save(new Follow(current, target));
         }
     }
 
@@ -43,7 +43,7 @@ public class FollowService {
         User current = userService.getCurrentUser();
         User target = userService.getUserByUsernamePrivate(username);
 
-        followRepository.deleteByFollowerIdAndFollowingId(
+        followRepository.deleteByFollower_IdAndFollowing_Id(
                 current.getId(), target.getId()
         );
     }
@@ -52,7 +52,7 @@ public class FollowService {
         User current = userService.getCurrentUser();
         User target = userService.getUserByUsernamePrivate(username);
 
-        return followRepository.existsByFollowerIdAndFollowingId(
+        return followRepository.existsByFollower_IdAndFollowing_Id(
                 current.getId(), target.getId()
         );
     }
@@ -62,34 +62,14 @@ public class FollowService {
         User user = userService.getUserByUsernamePrivate(username);
 
         return followRepository
-                .findByFollowingId(user.getId(), PageRequest.of(page, size))
-                .map(follow -> {
-                    User follower = userRepository.findById(follow.getFollowerId()).orElseThrow();
-                    return new PublicUserDto(
-                            follower.getUsernameField(),
-                            follower.getAvatar(),
-                            follower.getAbout(),
-                            0,
-                            0
-                    );
-                });
+                .findFollowers(user.getId(), PageRequest.of(page, size));
     }
 
     public Page<PublicUserDto> getFollowings(String username, int page, int size){
         User user = userService.getUserByUsernamePrivate(username);
 
         return followRepository
-                .findByFollowerId(user.getId(), PageRequest.of(page,size))
-                .map(follow -> {
-                    User following = userRepository.findById(follow.getFollowingId()).orElseThrow();
-                    return new PublicUserDto(
-                            following.getUsernameField(),
-                            following.getAvatar(),
-                            following.getAbout(),
-                            0,
-                            0
-                    );
-                });
+                .findFollowings(user.getId(), PageRequest.of(page,size));
     }
 
 

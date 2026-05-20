@@ -16,33 +16,34 @@ public class Follow {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "follower_id", nullable = false)
+    private User follower;
 
-    @Column(name = "follower_id", nullable = false)
-    private Long followerId;
 
-
-    @Column(name = "following_id", nullable = false)
-    private Long followingId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "following_id", nullable = false)
+    private User following;
 
     public Follow() {
     }
 
 
-    public Follow(Long followerId, Long followingId) {
-        this.followerId = followerId;
-        this.followingId = followingId;
+    public Follow(User follower, User following) {
+        this.follower = follower;
+        this.following = following;
     }
 
     public Long getId() {
         return id;
     }
 
-    public Long getFollowerId() {
-        return followerId;
+    public User getFollower() {
+        return follower;
     }
 
-    public Long getFollowingId() {
-        return followingId;
+    public User getFollowing() {
+        return following;
     }
 }
 

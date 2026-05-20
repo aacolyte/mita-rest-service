@@ -136,8 +136,8 @@ public class UserService {
         User user =  userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User with username " + username + " not found"));
 
-        long followers = followRepository.countByFollowingId(user.getId());
-        long followings = followRepository.countByFollowerId(user.getId());
+        long followers = followRepository.countByFollowing_Id(user.getId());
+        long followings = followRepository.countByFollower_Id(user.getId());
 
         return new PublicUserDto(
                 user.getUsernameField(),
