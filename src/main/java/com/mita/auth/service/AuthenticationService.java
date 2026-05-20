@@ -6,6 +6,7 @@ import com.mita.auth.dto.RegisterRequest;
 import com.mita.entity.RefreshToken;
 import com.mita.entity.Role;
 import com.mita.entity.User;
+import com.mita.exception.FieldConflictException;
 import com.mita.repository.RefresherTokenRepository;
 import com.mita.repository.UserRepository;
 import com.mita.security.JwtService;
@@ -44,6 +45,14 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse register(RegisterRequest request) {
+
+        if(userRepository.existsByEmail(request.getEmail())){
+            throw new FieldConflictException("EMAIL_TAKEN");
+        }
+        if(userRepository.existsByUsername(request.getName())){
+            throw new FieldConflictException("USERNAME_TAKEN");
+        }
+
         User user = new User(
                 request.getName(),
                 request.getEmail(),

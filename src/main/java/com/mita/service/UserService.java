@@ -7,6 +7,7 @@ import com.mita.dto.request.user.AvatarUpdateRequest;
 import com.mita.dto.request.user.NameUpdateRequest;
 import com.mita.dto.request.user.UserStatsDto;
 import com.mita.entity.User;
+import com.mita.exception.FieldConflictException;
 import com.mita.repository.CategoryRepository;
 import com.mita.repository.FollowRepository;
 import com.mita.repository.ItemRepository;
@@ -95,6 +96,11 @@ public class UserService {
     public UserDto updateName(NameUpdateRequest request){
         User currentUser = getCurrentUser();
         String name = request.getName();
+
+        if(userRepository.existsByUsername(name)){
+            throw new FieldConflictException("USERNAME_TAKEN");
+        }
+
         currentUser.setUsername(name);
         userRepository.save(currentUser);
 

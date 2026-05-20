@@ -16,6 +16,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
     List<User> findTop10ByUsernameContainingIgnoreCase(String username);
 
 
+    boolean existsByUsername(String name);
 
-
+    boolean existsByEmail(String email);
 }

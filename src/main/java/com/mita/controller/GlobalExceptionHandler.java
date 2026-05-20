@@ -1,6 +1,7 @@
 package com.mita.controller;
 
 import com.mita.exception.ErrorResponse;
+import com.mita.exception.FieldConflictException;
 import com.mita.exception.ValidationException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -102,6 +103,34 @@ public class GlobalExceptionHandler {
                 .body(Map.of("error", "Invalid email or password"));
     }
 
+
+    @ExceptionHandler(FieldConflictException.class)
+    public ResponseEntity<ErrorResponse> handleFieldConflictException(FieldConflictException ex, HttpServletRequest request) {
+        String message;
+        HttpStatus status = HttpStatus.CONFLICT;
+
+        switch (ex.getMessage()){
+            case "EMAIL_TAKEN" -> {
+                message = "Email already in use";
+            }
+            case "USERNAME_TAKEN" -> {
+                message = "Username already in use";
+            }
+            default -> {
+                message = "Field conflict";
+                status = HttpStatus.BAD_REQUEST;
+            }
+        }
+        ErrorResponse errorResponse = new ErrorResponse(
+                message,
+                status.value(),
+                Instant.now(),
+                request.getRequestURI()
+        );
+
+        return new ResponseEntity<>(errorResponse, status);
+
+    }
 
 
     private ResponseEntity<ErrorResponse> buildError(
