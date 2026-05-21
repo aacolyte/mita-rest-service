@@ -32,6 +32,11 @@ public class UserController {
         return ResponseEntity.ok(userService.getProfile(authentication));
     }
 
+    @GetMapping("/me")
+    public String me(){
+        return userService.getCurrentUser().getUsername();
+    }
+
     @PutMapping("/avatar")
     public ResponseEntity<UserDto> updateAvatar(@RequestBody AvatarUpdateRequest request){
         return ResponseEntity.ok(userService.updateAvatar(request));
