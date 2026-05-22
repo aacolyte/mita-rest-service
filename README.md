@@ -21,10 +21,10 @@ Please note: This repository contains only the back-end part of the application.
 
 ## 🚀 About The Project
 
-Mita is a full-stack web application for managing a digital library.
-The system supports authentication, authorization, and various operations for users, categories, and items.
+Mita is a full-stack web application that combines a digital library system with social networking features.
 
-It follows a stateless architecture using JWT with automatic token refresh on the frontend.
+Users can manage items and categories, build personal collections, and communicate through profiles and real-time chat.
+
 
 ## ✨ Features
 
@@ -40,7 +40,12 @@ It follows a stateless architecture using JWT with automatic token refresh on th
 
 - Various item sorting options
 
-- Edit profile
+- Real-time chat with other users
+
+- User profiles with editable information
+
+- View other users profiles and activity
+
 
 👑 **Admin**
 
@@ -63,6 +68,8 @@ It follows a stateless architecture using JWT with automatic token refresh on th
 - Spring Data
 
 - Spring Security
+
+- WebSocket
 
 - JWT
 
@@ -111,6 +118,8 @@ flowchart TD
 
 There is three main tables in database
 
+Note: The database schema is continuously evolving and may be updated as the project develops.
+
 ```mermaid
 erDiagram
 
@@ -147,6 +156,8 @@ erDiagram
 
 
 ## 📡 REST API Structure
+Note: The REST API is currently under active development and endpoints may be updated or extended.
+
 
 🔑 Auth Endpoints
 
@@ -211,14 +222,25 @@ erDiagram
 **Profile page:**
 
 - Avatar and name
+- Followers and followings
 - About block
 - Best items for each category
 - Logout button
 
 <p align="center">
-  <img src="readme_images/profile.png" alt="Main page">
+  <img src="readme_images/profile.png" alt="Profile page">
 </p>
 
+**Chat page:**
+
+- List of chats
+- Search chats
+- Chat
+- Back button
+
+<p align="center">
+  <img src="readme_images/chat.png" alt="Chat page">
+</p>
 
 **Add item page:**
 
@@ -228,19 +250,19 @@ erDiagram
 - Cancel button
 
 <p align="center">
-  <img src="readme_images/add_item.png" alt="Main page">
+  <img src="readme_images/add_item.png" alt="Add item page">
 </p>
 
 **Registration page:**
 
 <p align="center">
-  <img src="readme_images/register.png" alt="Main page">
+  <img src="readme_images/register.png" alt="Register page">
 </p>
 
 **Login page:**
 
 <p align="center">
-  <img src="readme_images/login.png" alt="Main page">
+  <img src="readme_images/login.png" alt="Login page">
 </p>
 
 ## 🚀 How to Run
