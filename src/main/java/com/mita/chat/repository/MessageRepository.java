@@ -10,4 +10,11 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 
     Message findTopByConversation_IdOrderByCreatedAtDesc(Long conversationId);
 
+    List<Message> findTop40ByConversationIdOrderByIdDesc(Long conversationId);
+
+    List<Message> findTop40ByConversationIdAndIdLessThanOrderByIdDesc(
+            Long conversationId, Long beforeId
+    );
+
+
 }

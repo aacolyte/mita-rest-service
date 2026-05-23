@@ -2,11 +2,15 @@ package com.mita.chat.controller;
 
 import com.mita.chat.dto.ConversationDto;
 import com.mita.chat.dto.MessageDto;
+import com.mita.chat.dto.MessagePageDto;
 import com.mita.chat.entity.Conversation;
 import com.mita.chat.service.ChatService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/chats")
@@ -23,9 +27,12 @@ public class ChatController {
         return c.getId();
     }
 
-    @GetMapping("/{id}/messages")
-    public List<MessageDto> getMessages(@PathVariable Long id){
-        return chatService.getMessagesDto(id);
+    @GetMapping("/{conversationId}/messages")
+    public MessagePageDto getMessages(
+            @PathVariable Long conversationId,
+            @RequestParam(required = false) Long beforeId
+    ){
+        return chatService.getMessagesDto(conversationId, beforeId);
     }
 
     @PostMapping("/{id}/messages")
@@ -36,8 +43,11 @@ public class ChatController {
     }
 
     @GetMapping
-    public List<ConversationDto> getMyChats(){
-        return chatService.getMyChats();
+    public Page<ConversationDto> getMyChats(
+            @PageableDefault(size = 30, sort = "lastMessageTime", direction = Sort.Direction.DESC)
+            Pageable pageable)
+    {
+        return chatService.getMyChats(pageable);
     }
 
 }

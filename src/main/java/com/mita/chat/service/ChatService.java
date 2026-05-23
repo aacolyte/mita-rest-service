@@ -2,6 +2,7 @@ package com.mita.chat.service;
 
 import com.mita.chat.dto.ConversationDto;
 import com.mita.chat.dto.MessageDto;
+import com.mita.chat.dto.MessagePageDto;
 import com.mita.chat.entity.Conversation;
 import com.mita.chat.entity.ConversationParticipant;
 import com.mita.chat.entity.Message;
@@ -11,8 +12,13 @@ import com.mita.chat.repository.MessageRepository;
 import com.mita.entity.User;
 import com.mita.repository.UserRepository;
 import com.mita.service.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -71,26 +77,34 @@ public class ChatService {
     }
 
 
-    @Transactional
-    public Message sendMessage(Long conversationId, String content) {
-        User sender = userService.getCurrentUser();
+//    @Transactional
+//    public Message sendMessage(Long conversationId, String content) {
+//        User sender = userService.getCurrentUser();
+//
+//        validateParticipant(conversationId, sender.getId());
+//
+//        Conversation conversation = conversationRepository.findById(conversationId)
+//                .orElseThrow();
+//
+//        Message message = new Message(conversation, sender, content);
+//
+//        return messageRepository.save(message);
+//    }
 
-        Conversation conversation = conversationRepository.findById(conversationId)
-                .orElseThrow();
 
-        Message message = new Message(conversation, sender, content);
-
-        return messageRepository.save(message);
-    }
-
-
-    public List<Message> getMessages(Long conversationId) {
-        return messageRepository.findByConversationIdOrderByCreatedAtAsc(conversationId);
-    }
+//    public List<Message> getMessages(Long conversationId) {
+//        Long userId = userService.getCurrentUser().getId();
+//
+//        validateParticipant(conversationId, userId);
+//
+//        return messageRepository.findByConversationIdOrderByCreatedAtAsc(conversationId);
+//    }
 
     @Transactional
     public MessageDto sendMessageDto(Long conversationId, String content) {
         User sender = userService.getCurrentUser();
+
+        validateParticipant(conversationId, sender.getId());
 
         Conversation conversation = conversationRepository.findById(conversationId)
                 .orElseThrow();
@@ -99,15 +113,30 @@ public class ChatService {
 
         messageRepository.save(message);
 
+        conversation.setLastMessageTime(message.getCreatedAt());
+        conversationRepository.save(conversation);
+
         return mapToDto(message);
     }
 
-    public List<ConversationDto> getMyChats(){
+    public Page<ConversationDto> getMyChats(Pageable pageable) {
         Long userId = userService.getCurrentUser().getId();
 
-        List<Conversation> conversations = conversationRepository.findUserConversations(userId);
+        int maxSize = 50;
 
-        return conversations.stream().map(c -> {
+
+        if (pageable.getPageSize() > maxSize) {
+            pageable = PageRequest.of(
+                    pageable.getPageNumber(),
+                    maxSize,
+                    pageable.getSort()
+            );
+        }
+
+
+        Page<Conversation> conversations = conversationRepository.findUserConversations(userId,pageable);
+
+        return conversations.map(c -> {
             Message lastMessage =  messageRepository
                     .findTopByConversation_IdOrderByCreatedAtDesc(c.getId());
 
@@ -126,7 +155,17 @@ public class ChatService {
                     lastMessage != null ? lastMessage.getContent() : null,
                     lastMessage != null ? lastMessage.getCreatedAt() : null
             );
-        }).toList();
+        });
+    }
+
+
+    private void validateParticipant(Long conversationId, Long userId) {
+        boolean isParticipant = participantRepository
+                .existsByConversationIdAndUserId(conversationId,userId);
+
+        if(!isParticipant) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Access denied: not a participant");
+        }
     }
 
 
@@ -140,12 +179,27 @@ public class ChatService {
         );
     }
 
-    public List<MessageDto> getMessagesDto(Long conversationId) {
-        return messageRepository
-                .findByConversationIdOrderByCreatedAtAsc(conversationId)
-                .stream()
-                .map(this::mapToDto)
-                .toList();
+    public MessagePageDto getMessagesDto(Long conversationId, Long beforeId) {
+        Long userId = userService.getCurrentUser().getId();
+
+        validateParticipant(conversationId, userId);
+
+        List<Message> messages;
+
+        if(beforeId == null){
+            messages = messageRepository
+                    .findTop40ByConversationIdOrderByIdDesc(conversationId);
+        } else {
+            messages = messageRepository
+                    .findTop40ByConversationIdAndIdLessThanOrderByIdDesc(conversationId, beforeId);
+        }
+
+        boolean hasMore = messages.size() == 40;
+
+        return new MessagePageDto(
+                messages.stream().map(this::mapToDto).toList(),
+                hasMore
+        );
     }
 
 
