@@ -2,6 +2,7 @@ package com.mita.chat.repository;
 
 import com.mita.chat.entity.ConversationParticipant;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 
 import java.util.List;
 
@@ -11,4 +12,7 @@ public interface ConversationParticipantRepository extends JpaRepository<Convers
     List<ConversationParticipant> findByConversationId(Long id);
 
     boolean existsByConversationIdAndUserId(Long conversationId, Long userId);
+
+    @Modifying
+    void deleteByConversationId(Long conversationId);
 }

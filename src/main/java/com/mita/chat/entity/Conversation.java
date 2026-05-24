@@ -15,7 +15,14 @@ public class Conversation {
     @Column
     private Instant lastMessageTime;
 
+    @Column
+    private Long lastMessageId;
+
     public Conversation() {
+    }
+
+    public Conversation(Long lastMessageId) {
+        this.lastMessageId = lastMessageId;
     }
 
     public Long getId() {
@@ -24,6 +31,15 @@ public class Conversation {
 
     public Instant getLastMessageTime() {
         return lastMessageTime;
+    }
+
+    public Long getLastMessageId() {
+        return lastMessageId;
+
+    }
+
+    public void setLastMessageId(Long lastMessageId) {
+        this.lastMessageId = lastMessageId;
     }
 
     public void setLastMessageTime(Instant lastMessageTime) {

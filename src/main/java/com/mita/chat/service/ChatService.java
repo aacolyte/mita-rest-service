@@ -110,11 +110,14 @@ public class ChatService {
                 .orElseThrow();
 
         Message message = new Message(conversation, sender, content);
-
         messageRepository.save(message);
 
-        conversation.setLastMessageTime(message.getCreatedAt());
-        conversationRepository.save(conversation);
+
+        conversationRepository.updateLastMessage(
+                conversationId,
+                message.getId(),
+                message.getCreatedAt()
+        );
 
         return mapToDto(message);
     }
@@ -133,30 +136,24 @@ public class ChatService {
             );
         }
 
-
-        Page<Conversation> conversations = conversationRepository.findUserConversations(userId,pageable);
-
-        return conversations.map(c -> {
-            Message lastMessage =  messageRepository
-                    .findTopByConversation_IdOrderByCreatedAtDesc(c.getId());
-
-            User otherUser = participantRepository
-                    .findByConversationId(c.getId())
-                    .stream()
-                    .map(ConversationParticipant::getUser)
-                    .filter(u -> !u.getId().equals(userId))
-                    .findFirst()
-                    .orElse(null);
-
-            return new ConversationDto(
-                    c.getId(),
-                    otherUser != null ? otherUser.getUsernameField() : null,
-                    otherUser != null ? otherUser.getAvatar() : null,
-                    lastMessage != null ? lastMessage.getContent() : null,
-                    lastMessage != null ? lastMessage.getCreatedAt() : null
-            );
-        });
+        return conversationRepository.findChatsWithLastMessage(userId, pageable);
     }
+
+    @Transactional
+    public void deleteChat(Long conversationId) {
+        Long userId = userService.getCurrentUser().getId();
+
+        validateParticipant(conversationId, userId);
+
+        Conversation conversation = conversationRepository.findById(conversationId)
+                .orElseThrow();
+
+        messageRepository.deleteByConversationId(conversationId);
+        participantRepository.deleteByConversationId(conversationId);
+        conversationRepository.deleteById(conversationId);
+    }
+
+
 
 
     private void validateParticipant(Long conversationId, Long userId) {

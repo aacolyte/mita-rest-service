@@ -2,6 +2,7 @@ package com.mita.chat.repository;
 
 import com.mita.chat.entity.Message;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 
 import java.util.List;
 
@@ -16,5 +17,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
             Long conversationId, Long beforeId
     );
 
+    @Modifying
+    void deleteByConversationId(Long conversationId);
 
 }

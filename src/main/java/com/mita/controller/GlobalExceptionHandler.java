@@ -4,6 +4,7 @@ import com.mita.exception.ErrorResponse;
 import com.mita.exception.FieldConflictException;
 import com.mita.exception.ValidationException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.catalina.connector.ClientAbortException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -14,6 +15,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 
 import java.time.Instant;
 import java.util.Map;
@@ -32,6 +34,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("error", "Internal Server Error"));
+    }
+
+    @ExceptionHandler(ClientAbortException.class)
+    public  void handleClientAbort(){
+        log.info("The client has terminated the connection.");
+    }
+
+    @ExceptionHandler(AsyncRequestNotUsableException.class)
+    public void handleAsyncError(){
+        log.info("The asynchronous request was canceled by the client.");
     }
 
 

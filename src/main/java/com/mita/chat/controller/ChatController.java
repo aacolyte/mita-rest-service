@@ -50,4 +50,9 @@ public class ChatController {
         return chatService.getMyChats(pageable);
     }
 
+    @DeleteMapping("/{conversationId}")
+    public void deleteChat(@PathVariable Long conversationId) {
+        chatService.deleteChat(conversationId);
+    }
+
 }
