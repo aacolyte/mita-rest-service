@@ -92,7 +92,10 @@ public class ItemService {
                         ? Sort.Direction.ASC
                         : Sort.Direction.DESC;
 
-        return Sort.by(direction, field);
+        return Sort.by(
+                new Sort.Order(direction, field),
+                new Sort.Order(Sort.Direction.ASC, "id")
+        );
     }
 
 
